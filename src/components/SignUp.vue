@@ -1,29 +1,24 @@
 <script setup lang = "ts">
-import { ref, Ref } from "vue";
+import { ref } from "vue";
 import {useRouter} from 'vue-router';
-// import firebase from "firebase/app";
-import { initializeApp } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword, UserCredential, sendEmailVerification } from "firebase/auth";
-import * as firebase from 'firebase/app';
+import {createUserWithEmailAndPassword, UserCredential, sendEmailVerification } from "firebase/auth";
 import 'firebase/firestore';
-import {db, auth} from '../firebase/init.js'
+import { auth } from '../firebase/init.js'
 const router = useRouter();
 
-
-//example
 const email = ref('');
 const password = ref('');
 
-    const submit = () => {
+  /* Allows user to sign up with email and password */
+    const signUp = () => {
         createUserWithEmailAndPassword(auth, email.value, password.value)
         .then((cred: UserCredential) => {
             sendEmailVerification(cred.user);
             console.log("Verification email has been sent to", cred.user?.email);
             router.push({
-              name: 'HelloWordle',
+              name: 'Polls',
               query: {email: cred.user?.email}
             });
-            // auth.signOut();
         })
             .catch((err: any) => {
             console.error("Oops", err);
@@ -37,9 +32,7 @@ const password = ref('');
     <h1>Create an Account</h1>
     <p><input type="text" placeholder="Email" v-model="email" /></p>
     <p><input type="password" placeholder="Password" v-model="password" /></p>
-    <p><button @click="submit">Submit</button></p>
-    
-    
+    <p><button @click="signUp"> Sign Up </button></p>
     <router-view />
   </template>
 

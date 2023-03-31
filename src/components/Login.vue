@@ -1,13 +1,10 @@
 <script setup lang="ts">
-  import { ref, Ref, watchEffect } from "vue";
+  import { ref } from "vue";
   import {useRouter} from 'vue-router';
   import 'firebase/auth';
-
-  import { initializeApp } from "firebase/app";
-  import { getAuth, signInWithEmailAndPassword, UserCredential, GoogleAuthProvider, signInWithPopup} from "firebase/auth";
-  import * as firebase from 'firebase/app';
+  import { signInWithEmailAndPassword, UserCredential, GoogleAuthProvider, signInWithPopup} from "firebase/auth";
   import 'firebase/firestore';
-  import {db, auth} from '../firebase/init.js'
+  import { auth } from '../firebase/init.js'
 
 const router = useRouter();
 
@@ -15,14 +12,14 @@ const router = useRouter();
 const email = ref('');
 const password = ref('');
 const provider = new GoogleAuthProvider();
+/* Allows user to log in with Google */
 const loginWGoog = () => {
   signInWithPopup(auth, provider)
   .then((cred: UserCredential) => {
-          document.cookie = `userEmail=${cred.user?.email}; expires=Thu, 01 Jan 2099 00:00:00 UTC; path=/;`;
-            console.log("Verification email has been sent to", cred.user?.email);
+          // document.cookie = `userEmail=${cred.user?.email}; expires=Thu, 01 Jan 2099 00:00:00 UTC; path=/;`;
             console.log('Successfully logged in!');
             router.push({
-              name: 'HelloWordle',
+              name: 'PollList',
               query: {email: cred.user?.email}
             });
         })
@@ -31,14 +28,14 @@ const loginWGoog = () => {
         });
       }
 
+  /* Allows user to log in with username and password */
   const login = () => {
         signInWithEmailAndPassword(auth, email.value, password.value)
         .then((cred: UserCredential) => {
-          document.cookie = `userEmail=${cred.user?.email}; expires=Thu, 01 Jan 2099 00:00:00 UTC; path=/;`;
-            console.log("Verification email has been sent to", cred.user?.email);
+          // document.cookie = `userEmail=${cred.user?.email}; expires=Thu, 01 Jan 2099 00:00:00 UTC; path=/;`;
             console.log('Successfully logged in!');
             router.push({
-              name: 'HelloWordle',
+              name: 'PollList',
               query: {email: cred.user?.email}
             });
         })
@@ -46,7 +43,7 @@ const loginWGoog = () => {
             console.error("Oops", err);
         });
     };
-    
+ 
 </script>
 
 <template>
