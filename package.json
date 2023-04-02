@@ -1,5 +1,5 @@
 {
-  "name": "cs371-wordle",
+  "name": "cs371-polls",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,7 +11,8 @@
   "dependencies": {
     "firebase": "^9.19.1",
     "firebase-tools": "^11.24.1",
-    "vue": "^3.2.45"
+    "vue": "^3.2.47",
+    "vue-router": "^4.1.6"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.0.0",

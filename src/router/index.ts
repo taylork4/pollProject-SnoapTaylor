@@ -10,24 +10,19 @@ const router = createRouter({
       component: () => import(".")
     },
     {
-      name: "HelloWordle",
-      path: "/HelloWordle",
-      component: () => import("../components/HelloWordle.vue"),
+      name: "Polls",
+      path: "/Polls",
+      component: () => import("../components/Polls.vue"),
     },
     {
       name: "SignUp",
       path: "/SignUp",
-      component: () => import("../components/SignUp.vue"),
+      component: () => import("../components/Signup.vue"),
     },
     {
       name: "Login",
       path: "/Login",
       component: () => import("../components/Login.vue"),
-    },
-    {
-      name: "GameStats",
-      path: "/GameStats",
-      component: () => import("../components/GameStats.vue"),
     }
   ]
 });

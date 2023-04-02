@@ -88,13 +88,7 @@ const signOut = () => {
       <nav class="nav-options">
         <span v-if="isLoggedIn">
           <span v-if="$route.path === '/'">
-            <router-link to="/HelloWordle"> HelloWordle </router-link> |
-          </span>
-          <span v-if="$route.path === '/HelloWordle'">
-            <router-link to="/GameStats"> Game Statistics </router-link> |
-          </span>
-          <span v-if="$route.path === '/GameStats'">
-            <router-link to="/HelloWordle"> HelloWordle </router-link> |
+            <router-link to="/Polls"> Polls </router-link> |
           </span>
           <button @click="signOut"> Logout </button>
         </span>

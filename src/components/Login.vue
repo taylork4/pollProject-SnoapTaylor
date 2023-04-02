@@ -19,7 +19,7 @@ const loginWGoog = () => {
           // document.cookie = `userEmail=${cred.user?.email}; expires=Thu, 01 Jan 2099 00:00:00 UTC; path=/;`;
             console.log('Successfully logged in!');
             router.push({
-              name: 'HelloWordle',
+              name: 'Polls',
               query: {email: cred.user?.email}
             });
         })
@@ -35,7 +35,7 @@ const loginWGoog = () => {
           // document.cookie = `userEmail=${cred.user?.email}; expires=Thu, 01 Jan 2099 00:00:00 UTC; path=/;`;
             console.log('Successfully logged in!');
             router.push({
-              name: 'HelloWordle',
+              name: 'Polls',
               query: {email: cred.user?.email}
             });
         })
