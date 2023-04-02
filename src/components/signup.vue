@@ -16,7 +16,7 @@ const password = ref('');
             sendEmailVerification(cred.user);
             console.log("Verification email has been sent to", cred.user?.email);
             router.push({
-              name: 'Polls',
+              name: 'HelloWordle',
               query: {email: cred.user?.email}
             });
         })

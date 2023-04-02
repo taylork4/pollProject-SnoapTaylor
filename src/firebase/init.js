@@ -4,13 +4,13 @@ import { getAuth } from "firebase/auth";
 
 
 const firebaseConfig = {
-  apiKey: "AIzaSyChY_39qf2UiPfhcYYboh4rnW21nKy1EZQ",
-  authDomain: "pollproject-snoaptaylor.firebaseapp.com",
-  projectId: "pollproject-snoaptaylor",
-  storageBucket: "pollproject-snoaptaylor.appspot.com",
-  messagingSenderId: "731430215461",
-  appId: "1:731430215461:web:e08e37553454362fbb84cc",
-  measurementId: "G-YSVXZHQVFZ"
+  apiKey: "AIzaSyAEn441hlz28aSWIZpiyP-Hzg2ts09HoKs",
+  authDomain: "polls-snoap-taylor.firebaseapp.com",
+  projectId: "polls-snoap-taylor",
+  storageBucket: "polls-snoap-taylor.appspot.com",
+  messagingSenderId: "800775808502",
+  appId: "1:800775808502:web:1775a14231f56cd929d3d7",
+  measurementId: "G-YTCEVMCMR0"
 };
   
   // Initialize Firebase
