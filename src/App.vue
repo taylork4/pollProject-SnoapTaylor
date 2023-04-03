@@ -104,7 +104,7 @@ const signOut = () => {
       </div>
     </div>
   <div v-if="$route.path === '/'">
-    <h1 style="color: darkblue; font-size: 50px;">SnoTay Wordle</h1>
+    <h1 style="color: darkblue; font-size: 50px;">Polls!</h1>
     <h4 style="font-size: large; color: black;">
       Cameron Snoap<br>
       Kyle Taylor
