@@ -15,15 +15,20 @@ const router = createRouter({
       component: () => import("../components/Polls.vue"),
     },
     {
-      name: "signUp",
-      path: "/signUp",
-      component: () => import("../components/signup.vue"),
+      name: "SignUp",
+      path: "/SignUp",
+      component: () => import("../components/Signup.vue"),
     },
     {
       name: "Login",
       path: "/Login",
       component: () => import("../components/Login.vue"),
-    }
+    },
+    {
+        name: "Profile",
+        path: "/Profile",
+        component: () => import("../components/Profile.vue"),
+      }
   ]
 });
 export default router;

@@ -82,14 +82,16 @@ const signOut = () => {
     router.push('/')
   }
 
+  /* Allows user to sign out and sends them back to the home screen */
+const plus = () => {
+
+}
+
 </script>
 <template>
     <div class="navbar">
       <nav class="nav-options">
         <span v-if="isLoggedIn">
-          <span v-if="$route.path === '/'">
-            <router-link to="/Polls"> Polls </router-link> |
-          </span>
           <button @click="signOut"> Logout </button>
         </span>
         <span v-else>
@@ -99,9 +101,18 @@ const signOut = () => {
         </span>
       </nav>
       <div class="email">
-        <!-- <h :key="$route.fullPath">{{$route.query.email}}</h> -->
-        <h>{{ newUserEmail }} </h>
+        <span v-if= "$route.path !== '/Profile' && isLoggedIn">
+            <router-link to="/Profile"> {{ newUserEmail }}  </router-link>
+        </span>
+        <span v-if="$route.path !== '/Polls'  && $route.path !== '/Login' && $route.path !== '/SignUp'">
+            <router-link to="/Polls"> Polls </router-link>
+        </span>
       </div>
+    </div>
+    <div class="header">
+        <span v-if="isLoggedIn &&  $route.path !== '/Profile'">
+            <button @click="plus"> + </button>
+        </span>
     </div>
   <div v-if="$route.path === '/'">
     <h1 style="color: darkblue; font-size: 50px;">Polls!</h1>
@@ -128,15 +139,28 @@ const signOut = () => {
   gap: 10px;
 }
 
+.header button {
+  border-radius: 8px;
+  border: 2px solid transparent;
+  padding: 0.15em .5em;
+  font-size: 2em;
+  font-weight: 700;
+  font-family: inherit;
+  background-color: #5c53d3;
+  color: white;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+
 .email {
   margin-left: auto;
 }
-.buttons {
+/* .buttons {
    display: flex;
    align-items: center;
    justify-content: center;
-   grid-gap: 8px;
- }
+ } */
 
  table {
     table-layout: auto; 

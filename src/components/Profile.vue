@@ -56,8 +56,7 @@ console.log(`New value ${newUserUid}`)
 </script>
 
 <template>
-  <h1> Click the + button to create a poll! </h1>
-  <h2> Or, feel free to </h2>
+  <h1> This is your profile! </h1>
 </template>  
 
 <style scoped>
@@ -89,17 +88,6 @@ console.log(`New value ${newUserUid}`)
    color: black;
  }
 
- #wrong {
-   background-color: grey;
- }
-
- #right {
-   background-color: green;
- }
-
- #misplaced {
-   background-color: rgb(186, 186, 3);
- }
 
  .buttons {
    display: flex;
@@ -108,17 +96,4 @@ console.log(`New value ${newUserUid}`)
    grid-gap: 8px;
  }
 
- #timer {
-   display: inline-block;
-   border: 5px solid brown;
-   border-radius: 8px;
-   width: 120px;
-   text-align: center;
-   padding-bottom: 3px;
-   color: black;
- }
-
- #timedisplay {
-   font-size: 280%;
- }
 </style>
