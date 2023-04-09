@@ -13,6 +13,17 @@ import { db, auth } from '../firebase/init.js'
 const dt = new Date();
 
 const dt_string = dt.toLocaleString();
+/* Firebase passing stuff */
+const gs = doc(db, 'profile/user')
+// const wordsColl = doc(db, 'wordleWords/words')
+let docData: {
+    email: string;
+    username: string;
+    userId: string;
+    firstName: string;
+    lastName: string;
+  }
+
 
 // define the type for the current route object
 interface CurrentRoute extends RouteLocationNormalized {
@@ -26,6 +37,19 @@ const email = route.query.email;
 const userUid = ref('');
 let usId = "";
 let newUserUid = "";
+
+const isLoggedIn = ref(true)
+  // runs after firebase is initialized
+  auth.onAuthStateChanged(function(user: User | null) {
+      if (user) {
+        isLoggedIn.value = true // if we have a user
+        userUid.value = user.uid; // store the user UID in the ref
+        console.log(`User UID: ${userUid.value}`);        
+      } else {
+        isLoggedIn.value = false // if we do not
+        userUid.value = ''; // clear the user UID ref
+      }
+  })
 
 async function logUserUid() {
   await new Promise<void>((resolve) => {
@@ -49,6 +73,56 @@ function setUserId(user: User | null) {
   }
 }
 
+/* Updates existing document */
+async function setFire(coll: DocumentReference, data: any) {
+  try {
+  await setDoc(coll, data);
+  // await addDoc(collection(coll, email as string), data)
+   console.log("Successful addition!");
+  } catch (error) {
+    console.log(`I got an error! ${error}`);
+  }
+}
+
+/* Adds a new document */
+async function addFire(coll: DocumentReference, data: any) {
+  try {
+  await addDoc(collection(coll, `${newUserUid}`), data)
+   console.log("Successful addition!");
+  } catch (error) {
+    console.log(`I got an error! ${error}`);
+  }
+}
+
+
+const profRef = collection(db, "gameStats");
+
+getDocs(profRef).then((profSnapshot) => {
+  const gameStatsPromises = profSnapshot.docs.map((profDoc) => {
+    const newUserIdRef = collection(profDoc.ref, newUserUid);
+    return getDocs(newUserIdRef).then((newUserIdSnapshot) => {
+      const newUserIdData = newUserIdSnapshot.docs.map((newUserIdDoc) => {
+        return { ...newUserIdDoc.data(), id: newUserIdDoc.id };
+      });
+      return { ...profDoc.data(), id: profDoc.id, newUserId: newUserIdData };
+    });
+  });
+  return Promise.all(gameStatsPromises);
+})
+.then((gameStatsData) => {
+  const newUserIdArray = gameStatsData.map((data) => data.newUserId);
+  console.log(gameStatsData);
+  if ('word' in newUserIdArray[0][0]) {
+    console.log(newUserIdArray[0][0].word); //Code to get 'word' from document.
+  }
+  console.log(newUserIdArray[0].length as number);
+//   numGames = newUserIdArray[0].length as number //Code to get number of documents in subcollection (USE FOR GAME NUMBER)
+})
+.catch((err) => {
+  console.log(err.message);
+});
+
+
 auth.onAuthStateChanged(setUserId);
 logUserUid();
 console.log(`New value ${newUserUid}`)
@@ -56,8 +130,10 @@ console.log(`New value ${newUserUid}`)
 </script>
 
 <template>
-  <h1> Click the + button to create a poll! </h1>
-  <h2> Or, feel free to </h2>
+    <span v-if="isLoggedIn">
+        <h1> Click the + button to create a poll! </h1>
+        <h2> Or, feel free to </h2>
+    </span>
 </template>  
 
 <style scoped>

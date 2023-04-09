@@ -61,17 +61,6 @@ function setUserId(user: User | null) {
   }
 }
 
-
-// function setUserId(user: User | null) {
-//   if (user) {
-//     userUid.value = user.uid;
-//     usId = user.uid;
-//   } else {
-//     userUid.value = '';
-//     usId = '';
-//   }
-// }
-
 auth.onAuthStateChanged(setUserId);
 logUserUid();
 console.log(`New value ${newUserUid}`)
