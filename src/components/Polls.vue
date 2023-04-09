@@ -11,7 +11,6 @@ import {collection, addDoc, DocumentReference, DocumentSnapshot, setDoc, doc, ge
 import { db, auth } from '../firebase/init.js'
 
 const dt = new Date();
-
 const dt_string = dt.toLocaleString();
 /* Firebase passing stuff */
 const gs = doc(db, 'profile/user')
@@ -37,6 +36,7 @@ const email = route.query.email;
 const userUid = ref('');
 let usId = "";
 let newUserUid = "";
+let createPoll = 0;
 
 const isLoggedIn = ref(true)
   // runs after firebase is initialized
@@ -127,14 +127,39 @@ auth.onAuthStateChanged(setUserId);
 logUserUid();
 console.log(`New value ${newUserUid}`)
 
+function plus() {
+    createPoll = 1;
+    console.log(createPoll);
+}
+
+function cancel() {
+    createPoll = 0;
+    console.log(createPoll);
+}
+
+
+// const post = () => {
+//     createPoll = true;
+// }
+
 </script>
 
 <template>
     <span v-if="isLoggedIn">
-        <h1> Click the + button to create a poll! </h1>
-        <h2> Or, feel free to </h2>
+        <div class="header">
+            <span v-if="createPoll == 0">
+                <button @click="plus"> + </button>
+            </span>
+            <span v-if="createPoll > 1">
+                <button @click="cancel"> Cancel </button>
+            </span>
+        </div>
+        <div v-if="createPoll == 0">
+            <h1> Click the + button to create a poll! </h1>
+            <h2> Or, feel free to </h2>
+        </div>
     </span>
-</template>  
+</template>
 
 <style scoped>
 /* @import url('../style.css'); */
@@ -156,7 +181,18 @@ console.log(`New value ${newUserUid}`)
    color: black;
    background-color: white;
  }
-
+ .header button {
+  border-radius: 8px;
+  border: 2px solid transparent;
+  padding: 0.15em .5em;
+  font-size: 2em;
+  font-weight: 700;
+  font-family: inherit;
+  background-color: #5c53d3;
+  color: white;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
  .report {
    background-color: darkseagreen;
    padding: 7px;

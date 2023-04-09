@@ -71,11 +71,6 @@ const signOut = () => {
     router.push('/')
   }
 
-  /* Allows user to sign out and sends them back to the home screen */
-const plus = () => {
-
-}
-
 </script>
 <template>
     <div class="navbar">
@@ -97,11 +92,6 @@ const plus = () => {
             <router-link to="/Polls"> Polls </router-link>
         </span>
       </div>
-    </div>
-    <div class="header">
-        <span v-if="isLoggedIn &&  $route.path !== '/Profile'">
-            <button @click="plus"> + </button>
-        </span>
     </div>
   <div v-if="$route.path === '/'">
     <h1 style="color: darkblue; font-size: 50px;">Polls!</h1>
@@ -128,18 +118,6 @@ const plus = () => {
   gap: 10px;
 }
 
-.header button {
-  border-radius: 8px;
-  border: 2px solid transparent;
-  padding: 0.15em .5em;
-  font-size: 2em;
-  font-weight: 700;
-  font-family: inherit;
-  background-color: #5c53d3;
-  color: white;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
 
 
 .email {
