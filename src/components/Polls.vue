@@ -18,13 +18,15 @@ const pollColl = doc(db, 'polls/user')
 let pollData: {
     pollQuestion: string;
     pollChoices: Array<string>;
-    userSelections: Array<number>;
+    votes: Array<number>;
     date: string;
+    pollsCreated: number;
   } = {
     pollQuestion: "",
     pollChoices: ["", "", "", ""],
-    userSelections: [0, 0, 0, 0],
-    date: dt_string
+    votes: [0, 0, 0, 0],
+    date: "",
+    pollsCreated: 0
   }
 
 
@@ -43,6 +45,8 @@ let newUserUid = "";
 let createPoll = ref(1);
 let option3 = ref(1);
 let option4 = ref(1);
+let numPolls: number = 0;
+let pollCount: number = 1;
 
 const isLoggedIn = ref(true)
   // runs after firebase is initialized
@@ -90,43 +94,43 @@ function setUserId(user: User | null) {
 //   }
 // }
 
-// /* Adds a new document */
-// async function addFire(coll: DocumentReference, data: any) {
-//   try {
-//   await addDoc(collection(coll, `${newUserUid}`), data)
-//    console.log("Successful addition!");
-//   } catch (error) {
-//     console.log(`I got an error! ${error}`);
-//   }
-// }
+/* Adds a new document */
+async function addFire(coll: DocumentReference, data: any) {
+  try {
+  await addDoc(collection(coll, `${newUserUid}`), data)
+   console.log("Successful addition!");
+  } catch (error) {
+    console.log(`I got an error! ${error}`);
+  }
+}
 
 
-// const pollsRef = collection(db, "polls");
+const pollsRef = collection(db, "polls");
 
-// getDocs(pollsRef).then((pollsSnapshot) => {
-//   const pollsPromises = pollsSnapshot.docs.map((pollsDoc) => {
-//     const newUserIdRef = collection(pollsDoc.ref, newUserUid);
-//     return getDocs(newUserIdRef).then((newUserIdSnapshot) => {
-//       const newUserIdData = newUserIdSnapshot.docs.map((newUserIdDoc) => {
-//         return { ...newUserIdDoc.data(), id: newUserIdDoc.id };
-//       });
-//       return { ...pollsDoc.data(), id: pollsDoc.id, newUserId: newUserIdData };
-//     });
-//   });
-//   return Promise.all(pollsPromises);
-// })
-// .then((pData) => {
-//   const newUserIdArray = pData.map((data) => data.newUserId);
-//   console.log(pData);
-//   if ('date' in newUserIdArray[0][0]) {
-//     console.log(newUserIdArray[0][0].date); //Code to get 'word' from document.
-//   }
+getDocs(pollsRef).then((pollsSnapshot) => {
+  const pollsPromises = pollsSnapshot.docs.map((pollsDoc) => {
+    const newUserIdRef = collection(pollsDoc.ref, newUserUid);
+    return getDocs(newUserIdRef).then((newUserIdSnapshot) => {
+      const newUserIdData = newUserIdSnapshot.docs.map((newUserIdDoc) => {
+        return { ...newUserIdDoc.data(), id: newUserIdDoc.id };
+      });
+      return { ...pollsDoc.data(), id: pollsDoc.id, newUserId: newUserIdData };
+    });
+  });
+  return Promise.all(pollsPromises);
+})
+.then((pData) => {
+  const newUserIdArray = pData.map((data) => data.newUserId);
+  console.log(pData);
+  if ('date' in newUserIdArray[0][0]) {
+    console.log(newUserIdArray[0][0].date); //Code to get 'word' from document.
+  }
 //   console.log(newUserIdArray[0].length as number);
-// //   numGames = newUserIdArray[0].length as number //Code to get number of documents in subcollection (USE FOR GAME NUMBER)
-// })
-// .catch((err) => {
-//   console.log(err.message);
-// });
+  numPolls = newUserIdArray[0].length as number //Code to get number of documents in subcollection (USE FOR GAME NUMBER)
+})
+.catch((err) => {
+  console.log(err.message);
+});
 
 
 auth.onAuthStateChanged(setUserId);
@@ -174,6 +178,10 @@ function post() {
     createPoll.value = 3 - createPoll.value;
     option3.value = 1;
     option4.value = 1;
+    pollData.date = dt_string;
+    pollData.pollsCreated = numPolls + pollCount;
+    pollCount = pollCount + 1;
+    addFire(pollColl, pollData);
 }
 
 </script>
@@ -217,7 +225,7 @@ function post() {
                 </div>
             </span>
         </div>
-        <div v-if="!createPoll">
+        <div v-if="createPoll == 1">
             <h1> Click the + button to create a poll! </h1>
             <h2> Or, feel free to</h2>
         </div>
