@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
 import 'firebase/firestore';
-//Create Router
 const router = createRouter({
   history: createWebHistory('/'),
   routes: [
