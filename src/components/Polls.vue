@@ -36,7 +36,7 @@ const email = route.query.email;
 const userUid = ref('');
 let usId = "";
 let newUserUid = "";
-let createPoll = 0;
+let createPoll = ref(false);
 
 const isLoggedIn = ref(true)
   // runs after firebase is initialized
@@ -128,13 +128,13 @@ logUserUid();
 console.log(`New value ${newUserUid}`)
 
 function plus() {
-    createPoll = 1;
-    console.log(createPoll);
+    createPoll.value = true;
+    console.log(createPoll.value);
 }
 
 function cancel() {
-    createPoll = 0;
-    console.log(createPoll);
+    createPoll.value = false;
+    console.log(createPoll.value);
 }
 
 
@@ -145,21 +145,16 @@ function cancel() {
 </script>
 
 <template>
-    <span v-if="isLoggedIn">
-        <div class="header">
-            <span v-if="createPoll == 0">
-                <button @click="plus"> + </button>
-            </span>
-            <span v-if="createPoll > 1">
-                <button @click="cancel"> Cancel </button>
-            </span>
-        </div>
-        <div v-if="createPoll == 0">
-            <h1> Click the + button to create a poll! </h1>
-            <h2> Or, feel free to </h2>
-        </div>
-    </span>
+  <div class="header">
+    <button @click="plus" v-show="!createPoll"> + </button>
+    <button @click="cancel" v-show="createPoll"> Cancel </button>
+  </div>
+  <div v-if="!createPoll">
+    <h1> Click the + button to create a poll! </h1>
+    <h2> Or, feel free to</h2>
+  </div>
 </template>
+
 
 <style scoped>
 /* @import url('../style.css'); */
