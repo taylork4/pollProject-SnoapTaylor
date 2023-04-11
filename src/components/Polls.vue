@@ -202,18 +202,17 @@ function post() {
                 </span>
                 <span v-if="option3 == 2">
                     <div>
-                        <input type="text" placeholder= "Poll Answer" v-model="pollData.pollChoices[2]" class="answer" />
+                        <input style="margin-right: 20px; margin-left: 66px;" type="text" placeholder= "Poll Answer" v-model="pollData.pollChoices[2]" class="answer" />
                         <button @click="op3"> - </button>
                     </div>
                 </span>
-                <br>
                 <br>
                 <span v-if="option4 == 1 && option3 == 2">
                     <button @click="op4"> + </button>
                 </span>
                 <span v-if="option4 == 2">
                     <div>
-                        <input type="text" placeholder= "Poll Answer" v-model="pollData.pollChoices[3]" class="answer" />
+                        <input style="margin-right: 20px; margin-left: 66px;" type="text" placeholder= "Poll Answer" v-model="pollData.pollChoices[3]" class="answer" />
                         <button @click="op4"> - </button>
                     </div>
                 </span>
@@ -227,7 +226,6 @@ function post() {
         </div>
         <div v-if="createPoll == 1">
             <h1> Click the + button to create a poll! </h1>
-            <h2> Or, feel free to</h2>
         </div>
     </span>
 </template>
