@@ -300,15 +300,20 @@ function scrollToTop() {
     </div>
     <div v-if="createPoll == 1">
       <h1 style="line-height: 100%;"> Click the + button to create a poll! </h1>
-      <div v-for="(poll, index) in publicPollData" :key="index">
-        <h2 class="pollQuestion">{{ poll.pollQuestion }}</h2>
-        <div v-for="(options) in poll.pollChoices">
-          <button class="pollButtons" v-if="options !== ''">{{ options }}</button>
-        </div><br>
-      </div>
-      <div>
-        <button @click="scrollToTop" class="back-to-top">Back to top</button>
-      </div>
+        <div v-for="(poll, index) in publicPollData" :key="index">
+            <span v-if="'pollQuestion' in poll">
+                <h2 class="pollQuestion">{{ poll.pollQuestion }}</h2>
+            </span>
+            <span v-if="'pollChoices' in poll">
+                <div v-for="(options) in poll.pollChoices">
+                    <button class="pollButtons" v-if="options !== ''">{{ options }}</button>
+                </div>
+                <br>
+            </span>
+        </div>
+        <div>
+            <button @click="scrollToTop" class="back-to-top">Back to top</button>
+        </div>
     </div>
   </span>
 </template>
