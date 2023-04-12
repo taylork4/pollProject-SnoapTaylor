@@ -13,7 +13,8 @@ import { db, auth } from '../firebase/init.js'
 const dt = new Date();
 const dt_string = dt.toLocaleString();
 /* Firebase passing stuff */
-const pollColl = doc(db, 'polls/user')
+const pollUser = doc(db, 'polls/user')
+const pollPublic = doc(db, 'polls/public')
 // const wordsColl = doc(db, 'wordleWords/words')
 let pollData: {
     pollQuestion: string;
@@ -83,19 +84,18 @@ function setUserId(user: User | null) {
   }
 }
 
-// /* Updates existing document */
-// async function setFire(coll: DocumentReference, data: any) {
-//   try {
-//   await setDoc(coll, data);
-//   // await addDoc(collection(coll, email as string), data)
-//    console.log("Successful addition!");
-//   } catch (error) {
-//     console.log(`I got an error! ${error}`);
-//   }
-// }
+async function setFire(coll: DocumentReference, data: any) {
+    try {
+        await setDoc(coll, data);
+        // await addDoc(collection(coll, email as string), data)
+        console.log("Successful addition!");
+    } catch (error) {
+        console.log(`I got an error! ${error}`);
+    }
+}
 
 /* Adds a new document */
-async function addFire(coll: DocumentReference, data: any) {
+async function addFireUser(coll: DocumentReference, data: any) {
   try {
   await addDoc(collection(coll, `${newUserUid}`), data)
    console.log("Successful addition!");
@@ -104,10 +104,43 @@ async function addFire(coll: DocumentReference, data: any) {
   }
 }
 
+/* Adds a new document */
+async function addFirePublic(coll: DocumentReference, data: any) {
+  try {
+  await addDoc(collection(coll, "allPolls"), data)
+   console.log("Successful addition!");
+  } catch (error) {
+    console.log(`I got an error! ${error}`);
+  }
+}
 
-const pollsRef = collection(db, "polls");
 
-getDocs(pollsRef).then((pollsSnapshot) => {
+const pollsPublicRef = collection(db, "polls/public/allPolls"); // Update collection reference to "allPolls"
+
+getDocs(pollsPublicRef).then((pollsSnapshot) => {
+  const pollsPromises = pollsSnapshot.docs.map((pollsDoc) => {
+    // Remove nested query for "newUserID"
+    return { ...pollsDoc.data(), id: pollsDoc.id };
+  });
+  return Promise.all(pollsPromises);
+})
+.then((pData) => {
+  console.log(pData);
+  // Access data from "allPolls" collection directly
+  if ('date' in pData[0]) {
+    console.log("PUBLIC DATE:", pData[0].date); // Code to get 'date' from document
+  }
+  numPolls = pData.length; // Code to get number of documents in "allPolls" subcollection
+  console.log(numPolls); // Code to get 'date' from document
+})
+.catch((err) => {
+  console.log(err.message);
+});
+
+
+/* WORKING CODE FOR PULLING FROM POLLS/USER */
+const pollsUserRef = collection(db, "polls");
+getDocs(pollsUserRef).then((pollsSnapshot) => {
   const pollsPromises = pollsSnapshot.docs.map((pollsDoc) => {
     const newUserIdRef = collection(pollsDoc.ref, newUserUid);
     return getDocs(newUserIdRef).then((newUserIdSnapshot) => {
@@ -123,7 +156,7 @@ getDocs(pollsRef).then((pollsSnapshot) => {
   const newUserIdArray = pData.map((data) => data.newUserId);
   console.log(pData);
   if ('date' in newUserIdArray[0][0]) {
-    console.log(newUserIdArray[0][0].date); //Code to get 'word' from document.
+    console.log("USER DATE: ", newUserIdArray[0][0].date); //Code to get 'word' from document.
   }
 //   console.log(newUserIdArray[0].length as number);
   numPolls = newUserIdArray[0].length as number //Code to get number of documents in subcollection (USE FOR GAME NUMBER)
@@ -181,7 +214,8 @@ function post() {
     pollData.date = dt_string;
     pollData.pollsCreated = numPolls + pollCount;
     pollCount = pollCount + 1;
-    addFire(pollColl, pollData);
+    addFireUser(pollUser, pollData);
+    addFirePublic(pollPublic, pollData);
 }
 
 </script>
