@@ -412,7 +412,8 @@ function scrollToTop() {
   width: 30%;
   justify-content: center;
   margin: 2px;
-  color: black;
+  background-color: #b1f1d2;
+  color: rgb(0, 0, 0);
 }
 
 .pollQuestion {
@@ -424,7 +425,7 @@ function scrollToTop() {
   width: fit-content;
   justify-content: center;
   margin-top: 5%;
-  color: black;
+  color: rgb(0, 0, 0);
 }
 
 </style>

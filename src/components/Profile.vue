@@ -51,30 +51,6 @@ async function fetchData(em: string) {
 }
 
 
-function dataAnalysis(data: any) {
-    const firstName = data.firstName; // Read 'firstName' field
-    const lastName = data.lastName; // Read 'lastName' field
-    const age = data.age; // Read 'age' field
-
-    console.log("First Name:", firstName);
-    console.log("Last Name:", lastName);
-    console.log("Age:", age);
-    
-    const firstNameElement = document.getElementById("firstName");
-      const lastNameElement = document.getElementById("lastName");
-      const ageElement = document.getElementById("age");
-    // Update the UI with the data
-    if (firstNameElement && lastNameElement && ageElement) {
-        firstNameElement.textContent = "First Name: " + firstName;
-        lastNameElement.textContent = "Last Name: " + lastName;
-        ageElement.textContent = "Age: " + age;
-    }
-    // document.getElementById("firstName").textContent = "First Name: " + firstName;
-    // document.getElementById("lastName").textContent = "Last Name: " + lastName;
-    // document.getElementById("age").textContent = "Age: " + age;
-}
-
-
 
 
 const isLoggedIn = ref(true)
@@ -98,6 +74,11 @@ const isLoggedIn = ref(true)
       newUserEmail = newValue;
       resolve();
     });
+    watch(userUid, (newValue, oldValue) => {
+      console.log(`userEmail changed from ${oldValue} to ${newValue}`);
+      newUserUid = newValue;
+      resolve();
+    });
   });
 
   console.log(`New userEmail value: ${newUserEmail}`);
@@ -119,6 +100,32 @@ function setUserId(user: User | null) {
 auth.onAuthStateChanged(setUserId);
 logUserUid();
 console.log(`New value ${newUserUid}`)
+function dataAnalysis(data: any) {
+    const firstName = data.firstName; // Read 'firstName' field
+    const lastName = data.lastName; // Read 'lastName' field
+    const age = data.age; // Read 'age' field
+
+    console.log("First Name:", firstName);
+    console.log("Last Name:", lastName);
+    console.log("Age:", age);
+    
+    const userIdElement = document.getElementById("userId");
+    const emailElement = document.getElementById("email");
+    const firstNameElement = document.getElementById("firstName");
+    const lastNameElement = document.getElementById("lastName");
+    const ageElement = document.getElementById("age");
+    // Update the UI with the data
+    if (firstNameElement && lastNameElement && ageElement && userIdElement && emailElement) {
+        userIdElement.textContent = "User ID: " + newUserUid
+        emailElement.textContent = "Email: " + newUserEmail
+        firstNameElement.textContent = "First Name: " + firstName;
+        lastNameElement.textContent = "Last Name: " + lastName;
+        ageElement.textContent = "Age: " + age;
+    }
+    // document.getElementById("firstName").textContent = "First Name: " + firstName;
+    // document.getElementById("lastName").textContent = "Last Name: " + lastName;
+    // document.getElementById("age").textContent = "Age: " + age;
+}
 // Define the collection and query
 // Define the collection and query
 
@@ -138,6 +145,8 @@ console.log(`New value ${newUserUid}`)
 
 <template>
     <h1> This is your profile! </h1>
+    <h2 id="userId"></h2>
+    <h2 id="email"></h2>
     <h2 id="firstName"></h2>
     <h2 id="lastName"></h2>
     <h2 id="age"></h2>
