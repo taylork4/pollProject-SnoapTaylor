@@ -12,15 +12,9 @@ const router = useRouter();
     let prData: {
         firstName: string;
         lastName: string;
-        age?: number | null;
     } = {
         firstName: "",
         lastName: "",
-        age: 0
-    }
-
-    if (prData.age === 0) {
-        prData.age = null;
     }
 
     const email = ref('');
@@ -70,7 +64,6 @@ const router = useRouter();
     <p><input type="password" placeholder="Password" v-model="password" /></p>
     <p><input type="text" placeholder="First Name" v-model="prData.firstName" /></p>
     <p><input type="text" placeholder="Last Name" v-model="prData.lastName" /></p>
-    <p><input type="number" placeholder="Age" v-model="prData.age" /></p>
     <p><button @click="signUp"> Sign Up </button></p>
     <router-view />
   </template>

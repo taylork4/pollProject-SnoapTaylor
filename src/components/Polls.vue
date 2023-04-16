@@ -17,18 +17,38 @@ const dt_string = dt.toLocaleString();
 const pollUser = doc(db, 'polls/user')
 const pollPublic = doc(db, 'polls/public')
 // const wordsColl = doc(db, 'wordleWords/words')
-let pollData: {
+let pollDataUser: {
   pollQuestion: string;
   pollChoices: Array<string>;
   votes: Array<number>;
+  responders: Array<string>;
+  favorited: boolean;
   date: string;
   pollsCreated: number;
 } = {
   pollQuestion: "",
   pollChoices: ["", "", "", ""],
   votes: [0, 0, 0, 0],
+  responders: [],
+  favorited: false,
   date: "",
   pollsCreated: 0
+}
+
+let pollDataPublic: {
+  pollQuestion: string;
+  pollChoices: Array<string>;
+  votes: Array<number>;
+  responders: Array<string>;
+  numFavorited: number;
+  date: string;
+} = {
+  pollQuestion: "",
+  pollChoices: ["", "", "", ""],
+  votes: [0, 0, 0, 0],
+  responders: [],
+  numFavorited: 0,
+  date: "",
 }
 
 
@@ -88,7 +108,6 @@ function setUserId(user: User | null) {
 async function setFire(coll: DocumentReference, data: any) {
   try {
     await setDoc(coll, data);
-    // await addDoc(collection(coll, email as string), data)
     console.log("Successful addition!");
   } catch (error) {
     console.log(`I got an error! ${error}`);
@@ -183,68 +202,56 @@ console.log(`New value ${newUserUid}`)
 
 function plus() {
   createPoll.value = 3 - createPoll.value;
-  pollData.pollQuestion = "";
-  pollData.pollChoices = ["", "", "", ""];
+  pollDataUser.pollQuestion = "";
+  pollDataUser.pollChoices = ["", "", "", ""];
+  pollDataPublic.pollQuestion = "";
+  pollDataPublic.pollChoices = ["", "", "", ""];
   option3.value = 1;
   option4.value = 1;
 }
 
 function op3() {
-  option3.value = 3 - option3.value;
-  if (option3.value == 1) {
-    pollData.pollChoices[2] = "";
-  }
-  if (option4.value == 2 && option3.value == 1) {
-    pollData.pollChoices[2] = pollData.pollChoices[3];
-    pollData.pollChoices[3] = "";
+    option3.value = 3 - option3.value;
+    if (option3.value == 1) {
+        pollDataUser.pollChoices[2] = "";
+        pollDataPublic.pollChoices[2] = "";
+    }
+    if (option4.value == 2 && option3.value == 1) {
+    pollDataUser.pollChoices[2] = pollDataUser.pollChoices[3];
+    pollDataUser.pollChoices[3] = "";
+    pollDataPublic.pollChoices[2] = pollDataPublic.pollChoices[3];
+    pollDataPublic.pollChoices[3] = "";
     option3.value = 2;
     option4.value = 1;
-  }
-  // if (option3.value == 2) {
-  //     pollData.pollChoices[2] = "";
-
-  // }
-  // option4.value = 1;
+    }
 }
+
 function op4() {
   option4.value = 3 - option4.value;
   if (option4.value == 1) {
-    pollData.pollChoices[3] = "";
+    pollDataUser.pollChoices[3] = "";
+    pollDataPublic.pollChoices[3] = "";
   }
-  // if (option4.value == 2 && option3.value == 1 && pollData.pollChoices[2] !== "") {
-  //     pollData.pollChoices[2] == pollData.pollChoices[3]
-  //     option3.value = 2;
-  //     option4.value = 1; 
-  // }
 }
-
-// function post() {
-//   createPoll.value = 3 - createPoll.value;
-//   option3.value = 1;
-//   option4.value = 1;
-//   pollData.date = dt_string;
-//   pollData.pollsCreated = numPolls + pollCount;
-//   pollCount = pollCount + 1;
-//   addFireUser(pollUser, pollData);
-//   addFirePublic(pollPublic, pollData);
-//   setTimeout(() => {
-//     window.location.reload();
-//   }, 1000);
-
-// }
 
 async function post() {
   createPoll.value = 3 - createPoll.value;
   option3.value = 1;
   option4.value = 1;
-  pollData.date = dt_string;
-  pollData.pollsCreated = numPolls + pollCount;
+  pollDataUser.date = dt_string;
+  pollDataPublic.date = pollDataUser.date;
+  pollDataUser.pollsCreated = numPolls + pollCount;
+  pollDataPublic.pollQuestion = pollDataUser.pollQuestion;
+  for (let i = 0; i < pollDataUser.pollChoices.length; i++) {
+    pollDataPublic.pollChoices[i] = pollDataUser.pollChoices[i]
+  }
+
   pollCount = pollCount + 1;
 
   // Wait for both promises to resolve before reloading the page
   await Promise.all([
-    addFireUser(pollUser, pollData),
-    addFirePublic(pollPublic, pollData),
+    addFireUser(pollUser, pollDataUser),
+    addFirePublic(pollPublic, pollDataPublic),
   ]);
   window.location.reload();
 }
@@ -256,66 +263,70 @@ function scrollToTop() {
   });
 }
 
+function optionsClick() {
+
+}
+
 </script>
 
 <template>
-  <span v-if="isLoggedIn">
-    <div class="header">
-      <span v-if="createPoll == 1">
-        <button @click="plus"> + </button>
-      </span>
-      <span v-if="createPoll == 2">
-        <button @click="plus"> Cancel </button>
-        <h1><input type="text" placeholder="Poll Question" v-model="pollData.pollQuestion" class="question" /></h1>
-        <h1><input type="text" placeholder="Poll Answer" v-model="pollData.pollChoices[0]" class="answer" /></h1>
-        <h1><input type="text" placeholder="Poll Answer" v-model="pollData.pollChoices[1]" class="answer" /></h1>
-        <span v-if="option3 == 1">
-          <button @click="op3"> + </button>
-        </span>
-        <span v-if="option3 == 2">
-          <div>
-            <input style="margin-right: 20px; margin-left: 66px;" type="text" placeholder="Poll Answer"
-              v-model="pollData.pollChoices[2]" class="answer" />
-            <button @click="op3"> - </button>
-          </div>
-        </span>
-        <br>
-        <span v-if="option4 == 1 && option3 == 2">
-          <button @click="op4"> + </button>
-        </span>
-        <span v-if="option4 == 2">
-          <div>
-            <input style="margin-right: 20px; margin-left: 66px;" type="text" placeholder="Poll Answer"
-              v-model="pollData.pollChoices[3]" class="answer" />
-            <button @click="op4"> - </button>
-          </div>
-        </span>
-        <br>
-        <br>
-        <br>
+    <span v-if="isLoggedIn">
         <div class="header">
-          <button @click="post"> Post </button>
-        </div>
-      </span>
+            <span v-if="createPoll == 1">
+                <button @click="plus"> + </button>
+            </span>
+            <span v-if="createPoll == 2">
+                <button @click="plus"> Cancel </button>
+                <h1><input type="text" placeholder="Poll Question" v-model="pollDataUser.pollQuestion" class="question" /></h1>
+                <h1><input type="text" placeholder="Poll Answer" v-model="pollDataUser.pollChoices[0]" class="answer" /></h1>
+                <h1><input type="text" placeholder="Poll Answer" v-model="pollDataUser.pollChoices[1]" class="answer" /></h1>
+            <span v-if="option3 == 1">
+                <button @click="op3"> + </button>
+            </span>
+            <span v-if="option3 == 2">
+                <div>
+                    <input style="margin-right: 20px; margin-left: 66px;" type="text" placeholder="Poll Answer" v-model="pollDataUser.pollChoices[2]" class="answer" />
+                    <button @click="op3"> - </button>
+                </div>
+            </span>
+            <br>
+            <span v-if="option4 == 1 && option3 == 2">
+                <button @click="op4"> + </button>
+            </span>
+            <span v-if="option4 == 2">
+                <div>
+                    <input style="margin-right: 20px; margin-left: 66px;" type="text" placeholder="Poll Answer" v-model="pollDataUser.pollChoices[3]" class="answer" />
+                    <button @click="op4"> - </button>
+                </div>
+            </span>
+            <br>
+            <br>
+            <br>
+            <div class="header">
+                <button @click="post"> Post </button>
+            </div>
+        </span>
     </div>
     <div v-if="createPoll == 1">
       <h1 style="line-height: 100%;"> Click the + button to create a poll! </h1>
+        <div>
+            <button @click="scrollToTop" class="back-to-top">Back to top</button>
+        </div>
+    </div>
+    </span>
+    <div v-if="createPoll == 1">
         <div v-for="(poll, index) in publicPollData" :key="index">
             <span v-if="'pollQuestion' in poll">
                 <h2 class="pollQuestion">{{ poll.pollQuestion }}</h2>
             </span>
             <span v-if="'pollChoices' in poll">
                 <div v-for="(options) in poll.pollChoices">
-                    <button class="pollButtons" v-if="options !== ''">{{ options }}</button>
+                    <button  @click="optionsClick" class="pollButtons" v-if="options !== ''">{{ options }}</button>
                 </div>
                 <br>
             </span>
         </div>
-        <div>
-            <button @click="scrollToTop" class="back-to-top">Back to top</button>
-        </div>
     </div>
-  </span>
 </template>
 
 
