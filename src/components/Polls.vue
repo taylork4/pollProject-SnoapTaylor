@@ -14,40 +14,18 @@ import { stringLength } from "@firebase/util";
 const dt = new Date();
 const dt_string = dt.toLocaleString();
 /* Firebase passing stuff */
-const pollUser = doc(db, 'polls/user')
 const pollPublic = doc(db, 'polls/public')
 // const wordsColl = doc(db, 'wordleWords/words')
-let pollDataUser: {
-  pollQuestion: string;
-  pollChoices: Array<string>;
-  votes: Array<number>;
-  responders: Array<string>;
-  favorited: boolean;
-  date: string;
-  pollsCreated: number;
-} = {
-  pollQuestion: "",
-  pollChoices: ["", "", "", ""],
-  votes: [0, 0, 0, 0],
-  responders: [],
-  favorited: false,
-  date: "",
-  pollsCreated: 0
-}
 
 let pollDataPublic: {
   pollQuestion: string;
   pollChoices: Array<string>;
   votes: Array<number>;
-  responders: Array<string>;
-  numFavorited: number;
   date: string;
 } = {
   pollQuestion: "",
   pollChoices: ["", "", "", ""],
   votes: [0, 0, 0, 0],
-  responders: [],
-  numFavorited: 0,
   date: "",
 }
 
@@ -168,32 +146,32 @@ getDocs(pollsPublicRef).then((pollsSnapshot) => {
   });
 
 
-/* WORKING CODE FOR PULLING FROM POLLS/USER */
-const pollsUserRef = collection(db, "polls");
-getDocs(pollsUserRef).then((pollsSnapshot) => {
-  const pollsPromises = pollsSnapshot.docs.map((pollsDoc) => {
-    const newUserIdRef = collection(pollsDoc.ref, newUserUid);
-    return getDocs(newUserIdRef).then((newUserIdSnapshot) => {
-      const newUserIdData = newUserIdSnapshot.docs.map((newUserIdDoc) => {
-        return { ...newUserIdDoc.data(), id: newUserIdDoc.id };
-      });
-      return { ...pollsDoc.data(), id: pollsDoc.id, newUserId: newUserIdData };
-    });
-  });
-  return Promise.all(pollsPromises);
-})
-  .then((pData) => {
-    const newUserIdArray = pData.map((data) => data.newUserId);
-    console.log(pData);
-    if ('date' in newUserIdArray[0][0]) {
-      console.log("USER DATE: ", newUserIdArray[0][0].date); //Code to get 'word' from document.
-    }
-    //   console.log(newUserIdArray[0].length as number);
-    numPolls = newUserIdArray[0].length as number //Code to get number of documents in subcollection (USE FOR GAME NUMBER)
-  })
-  .catch((err) => {
-    console.log(err.message);
-  });
+// /* WORKING CODE FOR PULLING FROM POLLS/USER */
+// const pollsUserRef = collection(db, "polls");
+// getDocs(pollsUserRef).then((pollsSnapshot) => {
+//   const pollsPromises = pollsSnapshot.docs.map((pollsDoc) => {
+//     const newUserIdRef = collection(pollsDoc.ref, newUserUid);
+//     return getDocs(newUserIdRef).then((newUserIdSnapshot) => {
+//       const newUserIdData = newUserIdSnapshot.docs.map((newUserIdDoc) => {
+//         return { ...newUserIdDoc.data(), id: newUserIdDoc.id };
+//       });
+//       return { ...pollsDoc.data(), id: pollsDoc.id, newUserId: newUserIdData };
+//     });
+//   });
+//   return Promise.all(pollsPromises);
+// })
+//   .then((pData) => {
+//     const newUserIdArray = pData.map((data) => data.newUserId);
+//     console.log(pData);
+//     if ('date' in newUserIdArray[0][0]) {
+//       console.log("USER DATE: ", newUserIdArray[0][0].date); //Code to get 'word' from document.
+//     }
+//     //   console.log(newUserIdArray[0].length as number);
+//     numPolls = newUserIdArray[0].length as number //Code to get number of documents in subcollection (USE FOR GAME NUMBER)
+//   })
+//   .catch((err) => {
+//     console.log(err.message);
+//   });
 
 
 auth.onAuthStateChanged(setUserId);
@@ -202,8 +180,6 @@ console.log(`New value ${newUserUid}`)
 
 function plus() {
   createPoll.value = 3 - createPoll.value;
-  pollDataUser.pollQuestion = "";
-  pollDataUser.pollChoices = ["", "", "", ""];
   pollDataPublic.pollQuestion = "";
   pollDataPublic.pollChoices = ["", "", "", ""];
   option3.value = 1;
@@ -213,12 +189,9 @@ function plus() {
 function op3() {
     option3.value = 3 - option3.value;
     if (option3.value == 1) {
-        pollDataUser.pollChoices[2] = "";
         pollDataPublic.pollChoices[2] = "";
     }
     if (option4.value == 2 && option3.value == 1) {
-    pollDataUser.pollChoices[2] = pollDataUser.pollChoices[3];
-    pollDataUser.pollChoices[3] = "";
     pollDataPublic.pollChoices[2] = pollDataPublic.pollChoices[3];
     pollDataPublic.pollChoices[3] = "";
     option3.value = 2;
@@ -229,7 +202,6 @@ function op3() {
 function op4() {
   option4.value = 3 - option4.value;
   if (option4.value == 1) {
-    pollDataUser.pollChoices[3] = "";
     pollDataPublic.pollChoices[3] = "";
   }
 }
@@ -238,19 +210,11 @@ async function post() {
   createPoll.value = 3 - createPoll.value;
   option3.value = 1;
   option4.value = 1;
-  pollDataUser.date = dt_string;
-  pollDataPublic.date = pollDataUser.date;
-  pollDataUser.pollsCreated = numPolls + pollCount;
-  pollDataPublic.pollQuestion = pollDataUser.pollQuestion;
-  for (let i = 0; i < pollDataUser.pollChoices.length; i++) {
-    pollDataPublic.pollChoices[i] = pollDataUser.pollChoices[i]
-  }
-
+  pollDataPublic.date = dt_string;
   pollCount = pollCount + 1;
 
   // Wait for both promises to resolve before reloading the page
   await Promise.all([
-    addFireUser(pollUser, pollDataUser),
     addFirePublic(pollPublic, pollDataPublic),
   ]);
   window.location.reload();
@@ -277,15 +241,15 @@ function optionsClick() {
             </span>
             <span v-if="createPoll == 2">
                 <button @click="plus"> Cancel </button>
-                <h1><input type="text" placeholder="Poll Question" v-model="pollDataUser.pollQuestion" class="question" /></h1>
-                <h1><input type="text" placeholder="Poll Answer" v-model="pollDataUser.pollChoices[0]" class="answer" /></h1>
-                <h1><input type="text" placeholder="Poll Answer" v-model="pollDataUser.pollChoices[1]" class="answer" /></h1>
+                <h1><input type="text" placeholder="Poll Question" v-model="pollDataPublic.pollQuestion" class="question" /></h1>
+                <h1><input type="text" placeholder="Poll Answer" v-model="pollDataPublic.pollChoices[0]" class="answer" /></h1>
+                <h1><input type="text" placeholder="Poll Answer" v-model="pollDataPublic.pollChoices[1]" class="answer" /></h1>
             <span v-if="option3 == 1">
                 <button @click="op3"> + </button>
             </span>
             <span v-if="option3 == 2">
                 <div>
-                    <input style="margin-right: 20px; margin-left: 66px;" type="text" placeholder="Poll Answer" v-model="pollDataUser.pollChoices[2]" class="answer" />
+                    <input style="margin-right: 20px; margin-left: 66px;" type="text" placeholder="Poll Answer" v-model="pollDataPublic.pollChoices[2]" class="answer" />
                     <button @click="op3"> - </button>
                 </div>
             </span>
@@ -295,7 +259,7 @@ function optionsClick() {
             </span>
             <span v-if="option4 == 2">
                 <div>
-                    <input style="margin-right: 20px; margin-left: 66px;" type="text" placeholder="Poll Answer" v-model="pollDataUser.pollChoices[3]" class="answer" />
+                    <input style="margin-right: 20px; margin-left: 66px;" type="text" placeholder="Poll Answer" v-model="pollDataPublic.pollChoices[3]" class="answer" />
                     <button @click="op4"> - </button>
                 </div>
             </span>
