@@ -42,6 +42,8 @@ const email = route.query.email;
 const userUid = ref('');
 let usId = "";
 let newUserUid = "";
+let pollQ = ref("");
+let pollC = ref(["","","",""]);
 let createPoll = ref(1);
 let option3 = ref(1);
 let option4 = ref(1);
@@ -180,6 +182,8 @@ console.log(`New value ${newUserUid}`)
 
 function plus() {
   createPoll.value = 3 - createPoll.value;
+  pollQ.value = "";
+  pollC.value = ["", "", "", ""];
   pollDataPublic.pollQuestion = "";
   pollDataPublic.pollChoices = ["", "", "", ""];
   option3.value = 1;
@@ -189,20 +193,20 @@ function plus() {
 function op3() {
     option3.value = 3 - option3.value;
     if (option3.value == 1) {
-        pollDataPublic.pollChoices[2] = "";
+        pollC.value[2] = "";
     }
     if (option4.value == 2 && option3.value == 1) {
-    pollDataPublic.pollChoices[2] = pollDataPublic.pollChoices[3];
-    pollDataPublic.pollChoices[3] = "";
-    option3.value = 2;
-    option4.value = 1;
+        pollC.value[2] = pollC.value[3];
+        pollC.value[3] = "";
+        option3.value = 2;
+        option4.value = 1;
     }
 }
 
 function op4() {
   option4.value = 3 - option4.value;
   if (option4.value == 1) {
-    pollDataPublic.pollChoices[3] = "";
+    pollC.value[3] = "";
   }
 }
 
@@ -211,7 +215,11 @@ async function post() {
   option3.value = 1;
   option4.value = 1;
   pollDataPublic.date = dt_string;
+  pollDataPublic.pollQuestion = pollQ.value;
   pollCount = pollCount + 1;
+  for (let i = 0; i < pollC.value.length; i++) {
+    pollDataPublic.pollChoices[i] = pollC.value[i]
+  }
 
   // Wait for both promises to resolve before reloading the page
   await Promise.all([
@@ -241,15 +249,15 @@ function optionsClick() {
             </span>
             <span v-if="createPoll == 2">
                 <button @click="plus"> Cancel </button>
-                <h1><input type="text" placeholder="Poll Question" v-model="pollDataPublic.pollQuestion" class="question" /></h1>
-                <h1><input type="text" placeholder="Poll Answer" v-model="pollDataPublic.pollChoices[0]" class="answer" /></h1>
-                <h1><input type="text" placeholder="Poll Answer" v-model="pollDataPublic.pollChoices[1]" class="answer" /></h1>
+                <h1><input type="text" placeholder="Poll Question" v-model="pollQ" class="question" /></h1>
+                <h1><input type="text" placeholder="Poll Answer" v-model="pollC[0]" class="answer" /></h1>
+                <h1><input type="text" placeholder="Poll Answer" v-model="pollC[1]" class="answer" /></h1>
             <span v-if="option3 == 1">
                 <button @click="op3"> + </button>
             </span>
             <span v-if="option3 == 2">
                 <div>
-                    <input style="margin-right: 20px; margin-left: 66px;" type="text" placeholder="Poll Answer" v-model="pollDataPublic.pollChoices[2]" class="answer" />
+                    <input style="margin-right: 20px; margin-left: 66px;" type="text" placeholder="Poll Answer" v-model="pollC[2]" class="answer" />
                     <button @click="op3"> - </button>
                 </div>
             </span>
@@ -259,14 +267,14 @@ function optionsClick() {
             </span>
             <span v-if="option4 == 2">
                 <div>
-                    <input style="margin-right: 20px; margin-left: 66px;" type="text" placeholder="Poll Answer" v-model="pollDataPublic.pollChoices[3]" class="answer" />
+                    <input style="margin-right: 20px; margin-left: 66px;" type="text" placeholder="Poll Answer" v-model="pollC[3]" class="answer" />
                     <button @click="op4"> - </button>
                 </div>
             </span>
             <br>
             <br>
             <br>
-            <div class="header">
+            <div class="header" v-if="!(pollC[0] === '' || pollC[1] === '' || pollQ === '')">
                 <button @click="post"> Post </button>
             </div>
         </span>
