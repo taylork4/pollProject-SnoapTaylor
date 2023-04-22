@@ -22,11 +22,13 @@ let pollDataPublic: {
   pollChoices: Array<string>;
   votes: Array<number>;
   date: string;
+  genre: string;
 } = {
   pollQuestion: "",
   pollChoices: ["", "", "", ""],
   votes: [0, 0, 0, 0],
   date: "",
+  genre: "",
 }
 
 
@@ -44,6 +46,8 @@ let usId = "";
 let newUserUid = "";
 let pollQ = ref("");
 let pollC = ref(["","","",""]);
+const genres = ["Music", "Pop Culture", "Food", "Sports", "Random"]
+let selectedGenre = ref("");
 let createPoll = ref(1);
 let option3 = ref(1);
 let option4 = ref(1);
@@ -188,6 +192,7 @@ function plus() {
   pollDataPublic.pollChoices = ["", "", "", ""];
   option3.value = 1;
   option4.value = 1;
+  selectedGenre.value = "";
 }
 
 function op3() {
@@ -220,6 +225,7 @@ async function post() {
   for (let i = 0; i < pollC.value.length; i++) {
     pollDataPublic.pollChoices[i] = pollC.value[i]
   }
+  pollDataPublic.genre = selectedGenre.value;
 
   // Wait for both promises to resolve before reloading the page
   await Promise.all([
@@ -250,6 +256,12 @@ function optionsClick() {
             <span v-if="createPoll == 2">
                 <button @click="plus"> Cancel </button>
                 <h1><input type="text" placeholder="Poll Question" v-model="pollQ" class="question" /></h1>
+                <div>
+                    <select v-model="selectedGenre" id="genre">
+                        <option value="">Select a Genre</option>
+                    <option v-for="genre in genres" :value="genre">{{ genre }}</option>
+                    </select>
+                </div>
                 <h1><input type="text" placeholder="Poll Answer" v-model="pollC[0]" class="answer" /></h1>
                 <h1><input type="text" placeholder="Poll Answer" v-model="pollC[1]" class="answer" /></h1>
             <span v-if="option3 == 1">
@@ -259,11 +271,13 @@ function optionsClick() {
                 <div>
                     <input style="margin-right: 20px; margin-left: 66px;" type="text" placeholder="Poll Answer" v-model="pollC[2]" class="answer" />
                     <button @click="op3"> - </button>
+
                 </div>
+                <br>
             </span>
-            <br>
             <span v-if="option4 == 1 && option3 == 2">
                 <button @click="op4"> + </button>
+                <br>
             </span>
             <span v-if="option4 == 2">
                 <div>
@@ -274,7 +288,8 @@ function optionsClick() {
             <br>
             <br>
             <br>
-            <div class="header" v-if="!(pollC[0] === '' || pollC[1] === '' || pollQ === '')">
+            <br>
+            <div class="header" v-if="!(pollC[0] === '' || pollC[1] === '' || pollQ === '' || selectedGenre === 'Select a genre' || selectedGenre === '')">
                 <button @click="post"> Post </button>
             </div>
         </span>
@@ -321,13 +336,27 @@ function optionsClick() {
   outline: none;
   transition: border-color 0.2s ease-in-out;
   width: 100%;
-  /* Set desired width here */
 }
 
 .question:hover,
 .question:focus {
   border-color: #1abc9c;
 }
+
+select {
+  border-radius: 8px;
+  border: 2px solid transparent;
+  border-color: #3498db;
+  padding: 10px;
+  font-size: 24px;
+  color: #a5d7f8;
+  outline: none;
+  /* background-color: rgb(189, 189, 189); */
+  transition: border-color 0.2s ease-in-out;
+  width: 25%;
+  text-align: center; /* Add this line */
+}
+
 
 .answer {
   border-radius: 8px;
@@ -366,18 +395,6 @@ function optionsClick() {
   font-size: 20px;
   border: 5px dashed black;
   color: black;
-}
-
-#wrong {
-  background-color: grey;
-}
-
-#right {
-  background-color: green;
-}
-
-#misplaced {
-  background-color: rgb(186, 186, 3);
 }
 
 .buttons {
