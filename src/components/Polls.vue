@@ -7,7 +7,7 @@ import { User } from "firebase/auth";
 import { ref, defineProps, computed, withDefaults, Ref, watch } from "vue"
 import { useRoute, RouteLocationNormalized } from 'vue-router';
 import 'firebase/firestore';
-import { collection, addDoc, DocumentReference, DocumentSnapshot, setDoc, doc, getDoc, getDocs, CollectionReference, query, collectionGroup, QuerySnapshot, where, QueryDocumentSnapshot } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, DocumentReference, DocumentSnapshot, setDoc, doc, getDoc, getDocs, CollectionReference, query, collectionGroup, QuerySnapshot, where, QueryDocumentSnapshot } from 'firebase/firestore';
 import { db, auth } from '../firebase/init.js'
 import { stringLength } from "@firebase/util";
 
@@ -45,7 +45,7 @@ const userUid = ref('');
 let usId = "";
 let newUserUid = "";
 let pollQ = ref("");
-let pollC = ref(["","","",""]);
+let pollC = ref(["", "", "", ""]);
 const genres = ["Music", "Pop Culture", "Food", "Sports", "Random"]
 let selectedGenre = ref("");
 let createPoll = ref(1);
@@ -196,16 +196,16 @@ function plus() {
 }
 
 function op3() {
-    option3.value = 3 - option3.value;
-    if (option3.value == 1) {
-        pollC.value[2] = "";
-    }
-    if (option4.value == 2 && option3.value == 1) {
-        pollC.value[2] = pollC.value[3];
-        pollC.value[3] = "";
-        option3.value = 2;
-        option4.value = 1;
-    }
+  option3.value = 3 - option3.value;
+  if (option3.value == 1) {
+    pollC.value[2] = "";
+  }
+  if (option4.value == 2 && option3.value == 1) {
+    pollC.value[2] = pollC.value[3];
+    pollC.value[3] = "";
+    option3.value = 2;
+    option4.value = 1;
+  }
 }
 
 function op4() {
@@ -241,79 +241,92 @@ function scrollToTop() {
   });
 }
 
-function optionsClick() {
-
+async function optionsClick(pollID: string, index: number) {  
+  // Increment the vote count for the selected option
+  pollDataPublic.votes[index]++;
+  // Update the document in Firestore
+  try {
+    const pollDocRef = doc(db, 'polls/public/allPolls', pollID);
+    await updateDoc(pollDocRef, { votes: pollDataPublic.votes });
+    console.log('Document updated successfully!');
+  } catch (error) {
+    console.log(`Error updating document: ${error}`);
+  }
 }
 
 </script>
 
 <template>
-    <span v-if="isLoggedIn">
-        <div class="header">
-            <span v-if="createPoll == 1">
-                <button @click="plus"> + </button>
-            </span>
-            <span v-if="createPoll == 2">
-                <button @click="plus"> Cancel </button>
-                <h1><input type="text" placeholder="Poll Question" v-model="pollQ" class="question" /></h1>
-                <div>
-                    <select v-model="selectedGenre" id="genre">
-                        <option value="">Select a Genre</option>
-                    <option v-for="genre in genres" :value="genre">{{ genre }}</option>
-                    </select>
-                </div>
-                <h1><input type="text" placeholder="Poll Answer" v-model="pollC[0]" class="answer" /></h1>
-                <h1><input type="text" placeholder="Poll Answer" v-model="pollC[1]" class="answer" /></h1>
-            <span v-if="option3 == 1">
-                <button @click="op3"> + </button>
-            </span>
-            <span v-if="option3 == 2">
-                <div>
-                    <input style="margin-right: 20px; margin-left: 66px;" type="text" placeholder="Poll Answer" v-model="pollC[2]" class="answer" />
-                    <button @click="op3"> - </button>
-
-                </div>
-                <br>
-            </span>
-            <span v-if="option4 == 1 && option3 == 2">
-                <button @click="op4"> + </button>
-                <br>
-            </span>
-            <span v-if="option4 == 2">
-                <div>
-                    <input style="margin-right: 20px; margin-left: 66px;" type="text" placeholder="Poll Answer" v-model="pollC[3]" class="answer" />
-                    <button @click="op4"> - </button>
-                </div>
-            </span>
-            <br>
-            <br>
-            <br>
-            <br>
-            <div class="header" v-if="!(pollC[0] === '' || pollC[1] === '' || pollQ === '' || selectedGenre === 'Select a genre' || selectedGenre === '')">
-                <button @click="post"> Post </button>
-            </div>
+  <span v-if="isLoggedIn">
+    <div class="header">
+      <span v-if="createPoll == 1">
+        <button @click="plus"> + </button>
+      </span>
+      <span v-if="createPoll == 2">
+        <button @click="plus"> Cancel </button>
+        <h1><input type="text" placeholder="Poll Question" v-model="pollQ" class="question" /></h1>
+        <div>
+          <select v-model="selectedGenre" id="genre">
+            <option value="">Select a Genre</option>
+            <option v-for="genre in genres" :value="genre">{{ genre }}</option>
+          </select>
+        </div>
+        <h1><input type="text" placeholder="Poll Answer" v-model="pollC[0]" class="answer" /></h1>
+        <h1><input type="text" placeholder="Poll Answer" v-model="pollC[1]" class="answer" /></h1>
+        <span v-if="option3 == 1">
+          <button @click="op3"> + </button>
         </span>
+        <span v-if="option3 == 2">
+          <div>
+            <input style="margin-right: 20px; margin-left: 66px;" type="text" placeholder="Poll Answer" v-model="pollC[2]"
+              class="answer" />
+            <button @click="op3"> - </button>
+
+          </div>
+          <br>
+        </span>
+        <span v-if="option4 == 1 && option3 == 2">
+          <button @click="op4"> + </button>
+          <br>
+        </span>
+        <span v-if="option4 == 2">
+          <div>
+            <input style="margin-right: 20px; margin-left: 66px;" type="text" placeholder="Poll Answer" v-model="pollC[3]"
+              class="answer" />
+            <button @click="op4"> - </button>
+          </div>
+        </span>
+        <br>
+        <br>
+        <br>
+        <br>
+        <div class="header"
+          v-if="!(pollC[0] === '' || pollC[1] === '' || pollQ === '' || selectedGenre === 'Select a genre' || selectedGenre === '')">
+          <button @click="post"> Post </button>
+        </div>
+      </span>
     </div>
     <div v-if="createPoll == 1">
       <h1 style="line-height: 100%;"> Click the + button to create a poll! </h1>
-        <div>
-            <button @click="scrollToTop" class="back-to-top">Back to top</button>
-        </div>
+      <div>
+        <button @click="scrollToTop" class="back-to-top">Back to top</button>
+      </div>
     </div>
-    </span>
-    <div v-if="createPoll == 1">
-        <div v-for="(poll, index) in publicPollData" :key="index">
-            <span v-if="'pollQuestion' in poll">
-                <h2 class="pollQuestion">{{ poll.pollQuestion }}</h2>
-            </span>
-            <span v-if="'pollChoices' in poll">
-                <div v-for="(options) in poll.pollChoices">
-                    <button  @click="optionsClick" class="pollButtons" v-if="options !== ''">{{ options }}</button>
-                </div>
-                <br>
-            </span>
+  </span>
+  <div v-if="createPoll == 1">
+    <div v-for="(poll, index) in publicPollData" :key="index">
+      <span v-if="'pollQuestion' in poll">
+        <h2 class="pollQuestion">{{ poll.pollQuestion }}</h2>
+      </span>
+      <span v-if="'pollChoices' in poll">
+        <div v-for="(options, index) in poll.pollChoices">
+          <button @click="optionsClick(poll.id, index)" class="pollButtons" v-if="options !== ''">{{ options }}</button>
         </div>
+
+        <br>
+      </span>
     </div>
+  </div>
 </template>
 
 
@@ -354,7 +367,8 @@ select {
   /* background-color: rgb(189, 189, 189); */
   transition: border-color 0.2s ease-in-out;
   width: 25%;
-  text-align: center; /* Add this line */
+  text-align: center;
+  /* Add this line */
 }
 
 
@@ -426,6 +440,4 @@ select {
   justify-content: center;
   margin-top: 5%;
   color: rgb(0, 0, 0);
-}
-
-</style>
+}</style>
