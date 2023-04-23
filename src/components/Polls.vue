@@ -270,7 +270,7 @@ async function post() {
   await Promise.all([
     addFirePublic(pollPublic, pollDataPublic),
   ]);
-  //   window.location.reload();
+    window.location.reload();
 }
 
 function scrollToTop() {
@@ -311,6 +311,7 @@ async function optionsClick(pollID: string, index: number) {
       }
     }
   }
+//   window.location.reload();
 }
 
 async function toggleFavorite(pollID: string, index: number) {
@@ -402,10 +403,10 @@ async function toggleFavorite(pollID: string, index: number) {
           {{ poll.pollQuestion }}
         </h2>
       </span>
-      <span v-if="'pollChoices' in poll">
+      <span v-if="'pollChoices' in poll && 'votes' in poll">
         <div v-for="(options, index) in poll.pollChoices">
           <button @click="optionsClick(poll.id, index)" class="pollButtons" v-if="options !== ''">{{ options }}</button>
-          <p style="display: inline-block; margin-left: 10px;" v-if="options !== ''">{{ (100*(poll.votes[index] / (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
+          <p style="display: inline-block; margin-left: 10px;" v-if="options !== '' && Array.isArray(poll.votes)">{{ (100*(poll.votes[index] / (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
         </div>
         <br>
       </span>
@@ -422,7 +423,7 @@ async function toggleFavorite(pollID: string, index: number) {
       <span v-if="'pollChoices' in poll && 'genre' in poll && 'votes' in poll">
         <div v-for="(options, index) in poll.pollChoices" v-if="poll.genre === filterGenre">
           <button @click="optionsClick(poll.id, index)" class="pollButtons" v-if="options !== ''">{{ options }}</button>
-          <p style="display: inline-block; margin-left: 10px;" v-if="options !== ''">{{ (100*(poll.votes[index] / (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
+          <p style="display: inline-block; margin-left: 10px;" v-if="options !== '' && Array.isArray(poll.votes)">{{ (100*(poll.votes[index] / (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
         </div>
         <br>
       </span>
