@@ -122,7 +122,6 @@ async function addFirePublic(coll: DocumentReference, data: any) {
     const docRef = await addDoc(collection(coll, "allPolls"), data);
     const pollId = docRef.id;
     setCreated(pollId);
-    console.log("Added poll ID:", pollId);
     getDocs(pollsPublicRef).then((pollsSnapshot) => {
     const pollsPromises = pollsSnapshot.docs.map((pollsDoc) => {
         return { ...pollsDoc.data(), id: pollsDoc.id };

@@ -7,7 +7,7 @@ import { User } from "firebase/auth";
 import { ref, defineProps, computed, withDefaults, Ref, watch } from "vue"
 import { useRoute, RouteLocationNormalized } from 'vue-router';
 import 'firebase/firestore';
-import {collection, addDoc, updateDoc, DocumentReference, DocumentSnapshot, setDoc, doc, getDoc, getDocs, CollectionReference, query, collectionGroup, QuerySnapshot, where, QueryDocumentSnapshot } from 'firebase/firestore';
+import {collection, addDoc, updateDoc, DocumentReference, DocumentSnapshot, setDoc, doc, getDoc, getDocs, CollectionReference, query, collectionGroup, QuerySnapshot, where, QueryDocumentSnapshot, deleteDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase/init.js'
 const dt = new Date();
 
@@ -174,6 +174,16 @@ async function toggleFavorite(pollID: string, index: number) {
     }
 }
 
+async function deletePoll(pollID: string, index: number) {
+    const allPollRef = doc(db, "polls/public/allPolls", pollID);
+    const allPollDoc = await getDoc(allPollRef);
+    if (confirm("Are you sure you want to delete your poll?")) {
+        if (allPollDoc.exists()) {
+            await deleteDoc(allPollRef);
+        }
+    }
+}
+
 </script>
 
 <template>
@@ -198,6 +208,7 @@ async function toggleFavorite(pollID: string, index: number) {
             <span v-if="'pollQuestion' in poll && 'genre' in poll">
             <h2 class="pollQuestion">
                 <span class="star" @click="toggleFavorite(poll.id, index)">&#9734;</span>
+                <span class="delete" @click="deletePoll(poll.id, index)"> × </span>
                 {{ poll.pollQuestion }}
             </h2>
             </span>
@@ -215,7 +226,8 @@ async function toggleFavorite(pollID: string, index: number) {
             <span v-if="'pollQuestion' in poll">
             <h2 class="pollQuestion">
                 <span class="star" @click="toggleFavorite(poll.id, index)">&#9734;</span>
-                {{ poll.pollQuestion }}
+                <span class="delete" @click="deletePoll(poll.id, index)"> × </span>
+                    {{ poll.pollQuestion }}
             </h2>
             </span>
       <span v-if="'pollChoices' in poll && 'genre' in poll">
@@ -262,14 +274,28 @@ async function toggleFavorite(pollID: string, index: number) {
   width: 100%;
 }
 
-.star {
+.delete {
   position: absolute;
   top: 0;
   right: 0;
+  color: red;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 1%;
+}
+
+.star {
+  position: absolute;
+  top: 0;
+  right: 18px;
   color: black;
   font-size: 24px;
   cursor: pointer;
   padding: 1%;
+}
+
+.delete {
+  color: red;
 }
 
 .star.favorite {
