@@ -18,9 +18,9 @@ const router = useRouter();
     } = {
         firstName: "",
         lastName: "",
-        created: [""],
-        responded: [""],
-        favorited: [""]
+        created: [],
+        responded: [],
+        favorited: []
     }
 
     const email = ref('');

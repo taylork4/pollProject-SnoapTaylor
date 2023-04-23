@@ -268,6 +268,19 @@ function scrollToTop() {
   });
 }
 
+// async function delete(pollID: string, index: number) {
+//   const pollRef = doc(db, "polls/public/allPolls", pollID);
+//   const pollDoc = await getDoc(pollRef);
+
+//   if (pollDoc.exists()) {
+//     const pollData = pollDoc.data();
+//     if (pollData) {
+//       pollData.votes[index]++;
+//       await updateDoc(pollRef, pollData);
+//     }
+//   }
+// }
+
 async function optionsClick(pollID: string, index: number) {
   const pollRef = doc(db, "polls/public/allPolls", pollID);
   const pollDoc = await getDoc(pollRef);
@@ -281,8 +294,22 @@ async function optionsClick(pollID: string, index: number) {
   }
 }
 
-function toggleFavorite(index: number) {
+async function toggleFavorite(pollID: string, index: number) {
+    const pollRef = doc(db, "profile", newUserEmail);
+    const pollDoc = await getDoc(pollRef);
 
+    if (pollDoc.exists()) {
+        const pollData = pollDoc.data();
+        if (pollData) {
+            if (!pollData.favorited.includes(pollID)) {
+                pollData.favorited.push(pollID);
+                await updateDoc(pollRef, pollData);
+            } else {
+                pollData.favorited = pollData.favorited.filter((id: any) => id !== pollID);
+                await updateDoc(pollRef, pollData);
+            }
+        }
+    }
 }
  
 
@@ -352,7 +379,7 @@ function toggleFavorite(index: number) {
         <div v-for="(poll, index) in publicPollData" :key="index">
             <span v-if="'pollQuestion' in poll">
             <h2 class="pollQuestion">
-                <span class="star" @click="toggleFavorite(index)">&#9734;</span>
+                <span class="star"  @click="toggleFavorite(poll.id, index)">&#9734;</span>
                 {{ poll.pollQuestion }}
             </h2>
             </span>
@@ -368,7 +395,7 @@ function toggleFavorite(index: number) {
         <div v-for="(poll, index) in publicPollData" :key="index">
             <span v-if="'pollQuestion' in poll && 'genre' in poll">
             <h2 class="pollQuestion" v-if="poll.genre === filterGenre">
-                <span class="star" @click="toggleFavorite(index)">&#9734;</span>
+                <span class="star" @click="toggleFavorite(poll.id, index)">&#9734;</span>
                 {{ poll.pollQuestion }}
             </h2>
             </span>
