@@ -7,7 +7,7 @@ import { User } from "firebase/auth";
 import { ref, defineProps, computed, withDefaults, Ref, watch } from "vue"
 import { useRoute, RouteLocationNormalized } from 'vue-router';
 import 'firebase/firestore';
-import {collection, addDoc, DocumentReference, DocumentSnapshot, setDoc, doc, getDoc, getDocs, CollectionReference, query, collectionGroup, QuerySnapshot, where, QueryDocumentSnapshot } from 'firebase/firestore';
+import {collection, addDoc, updateDoc, DocumentReference, DocumentSnapshot, setDoc, doc, getDoc, getDocs, CollectionReference, query, collectionGroup, QuerySnapshot, where, QueryDocumentSnapshot } from 'firebase/firestore';
 import { db, auth } from '../firebase/init.js'
 const dt = new Date();
 
@@ -27,6 +27,9 @@ const userEmail = ref('');
 let usId = "";
 let newUserUid = "";
 let newUserEmail = "";
+const filterOptions = ["Favorited Polls  ⭐", "Polls Responded To", "Polls Created", "Statistics"]
+let filterSelection = ref ("");
+let numPolls: number = 0;
 
 let prData: {
     firstName: string;
@@ -53,6 +56,37 @@ async function fetchData(em: string) {
 }
 
 
+const pollsPublicRef = collection(db, "polls/public/allPolls"); // Update collection reference to "allPolls"
+interface PollData {
+  id: string
+}[];
+
+let publicPollData = ref<PollData[]>([]);
+
+getDocs(pollsPublicRef).then((pollsSnapshot) => {
+  const pollsPromises = pollsSnapshot.docs.map((pollsDoc) => {
+    // Remove nested query for "newUserID"
+    return { ...pollsDoc.data(), id: pollsDoc.id };
+  });
+  return Promise.all(pollsPromises);
+})
+  .then((pData) => {
+    console.log(pData);
+
+    for (let i = 0; i < pData.length; i++) {
+      publicPollData.value[i] = pData[i]
+    }
+
+    // Access data from "allPolls" collection directly
+    if ('date' in pData[0]) {
+      console.log("PUBLIC DATE:", pData[0].date); // Code to get 'date' from document
+    }
+    numPolls = pData.length; // Code to get number of documents in "allPolls" subcollection
+    console.log(numPolls); // Code to get 'date' from document
+  })
+  .catch((err) => {
+    console.log(err.message);
+  });
 
 
 const isLoggedIn = ref(true)
@@ -122,14 +156,76 @@ function dataAnalysis(data: any) {
     }
 }
 
+async function toggleFavorite(pollID: string, index: number) {
+    const pollRef = doc(db, "profile", newUserEmail);
+    const pollDoc = await getDoc(pollRef);
+
+    if (pollDoc.exists()) {
+        const pollData = pollDoc.data();
+        if (pollData) {
+            if (!pollData.favorited.includes(pollID)) {
+                pollData.favorited.push(pollID);
+                await updateDoc(pollRef, pollData);
+            } else {
+                pollData.favorited = pollData.favorited.filter((id: any) => id !== pollID);
+                await updateDoc(pollRef, pollData);
+            }
+        }
+    }
+}
+
 </script>
 
 <template>
-    <h1> This is your profile! </h1>
-    <h2 id="userId"></h2>
-    <h2 id="email"></h2>
-    <h2 id="firstName"></h2>
-    <h2 id="lastName"></h2>
+  <span class="header">
+    <select v-model="filterSelection">
+      <option value="">Filter by</option>
+      <option v-for="ops in filterOptions" :value="filterOptions">{{ ops }}</option>
+    </select>
+  </span>
+    <br>
+    <div class="report">
+        <h1> This is your profile! </h1>
+        <h2 id="firstName"></h2>
+        <h2 id="lastName"></h2>
+        <h2 id="email"></h2>
+        <h2 id="userId"></h2>
+    </div>
+    <br>
+    <br>
+    <div v-if="(filterSelection === 'Filter by' || filterSelection === '')">
+        <div v-for="(poll, index) in publicPollData" :key="index">
+            <span v-if="'pollQuestion' in poll && 'genre' in poll">
+            <h2 class="pollQuestion">
+                <span class="star" @click="toggleFavorite(poll.id, index)">&#9734;</span>
+                {{ poll.pollQuestion }}
+            </h2>
+            </span>
+      <span v-if="'pollChoices' in poll && 'genre' in poll">
+        <div v-for="(options, index) in poll.pollChoices">
+          <button class="pollButtons" v-if="options !== ''">{{ options }}</button>
+        </div>
+        <br>
+      </span>
+    </div>
+  </div>
+  <div v-if="(filterSelection === 'Favorited Polls  ⭐')">
+        <div v-for="(poll, index) in publicPollData" :key="index">
+            
+            <span v-if="'pollQuestion' in poll">
+            <h2 class="pollQuestion">
+                <span class="star" @click="toggleFavorite(poll.id, index)">&#9734;</span>
+                {{ poll.pollQuestion }}
+            </h2>
+            </span>
+      <span v-if="'pollChoices' in poll && 'genre' in poll">
+        <div v-for="(options, index) in poll.pollChoices">
+          <button class="pollButtons" v-if="options !== ''">{{ options }}</button>
+        </div>
+        <br>
+      </span>
+    </div>
+  </div>
   <!-- <img src="./assets/profIcon.png" alt=""> -->
 </template>  
 
@@ -154,20 +250,105 @@ function dataAnalysis(data: any) {
    background-color: white;
  }
 
+ .question {
+  border-radius: 8px;
+  border: 2px solid transparent;
+  border-color: #3498db;
+  padding: 10px;
+  font-size: 24px;
+  color: #3498db;
+  outline: none;
+  transition: border-color 0.2s ease-in-out;
+  width: 100%;
+}
+
+.star {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: black;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 1%;
+}
+
+.star.favorite {
+  color: gold;
+  cursor: pointer;
+  padding: 1%;
+}
+
+.question:hover,
+.question:focus {
+  border-color: #1abc9c;
+}
+
+.answer {
+  border-radius: 8px;
+  border: 2px solid transparent;
+  border-color: #3498db;
+  padding: 10px;
+  font-size: 24px;
+  color: #3498db;
+  outline: none;
+  transition: border-color 0.2s ease-in-out;
+  width: 50%;
+  /* Set desired width here */
+}
+
+.answer:hover,
+.answer:focus {
+  border-color: #1abc9c;
+}
+
+.pollButtons {
+  border-radius: 8px;
+  border: 2px solid transparent;
+  border-color: #3498db;
+  display: inline-block;
+  width: 30%;
+  justify-content: center;
+  margin: 2px;
+  background-color: #b1f1d2;
+  color: rgb(0, 0, 0);
+  cursor: default;
+}
+
+.pollQuestion {
+  border-radius: 8px;
+  border: 2px solid transparent;
+  border-color: #3498db;
+  padding: 3%;
+  display: inline-block;
+  width: fit-content;
+  justify-content: center;
+  margin-top: 5%;
+  color: rgb(0, 0, 0);
+  position: relative; /* make the position of the container element relative */
+}
+
  .report {
    background-color: darkseagreen;
-   padding: 7px;
+   padding: 20px;
    font-size: 20px;
    border: 5px dashed black;
    color: black;
  }
 
 
- .buttons {
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   grid-gap: 8px;
- }
+ select {
+  border-radius: 8px;
+  border: 2px solid transparent;
+  border-color: #3498db;
+  padding: 10px;
+  font-size: 24px;
+  color: #a5d7f8;
+  outline: none;
+  margin-bottom: 40px;
+  /* background-color: rgb(189, 189, 189); */
+  transition: border-color 0.2s ease-in-out;
+  width: 25%;
+  text-align: center;
+}
 
 </style>

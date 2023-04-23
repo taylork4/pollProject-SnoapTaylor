@@ -254,7 +254,7 @@ async function post() {
   }
   pollDataPublic.genre = selectedGenre.value;
 
-  // Wait for both promises to resolve before reloading the page
+  // Wait for promise to resolve before reloading the page
   await Promise.all([
     addFirePublic(pollPublic, pollDataPublic),
   ]);
@@ -323,15 +323,15 @@ async function toggleFavorite(pollID: string, index: number) {
 </script>
 
 <template>
+  <div v-if="createPoll == 1">
+    <select v-model="filterGenre" id="genre">
+      <option value="">Filter by Genre</option>
+      <option v-for="genre in genres" :value="genre">{{ genre }}</option>
+    </select>
+  </div>
+  <br>
   <span v-if="isLoggedIn">
     <div class="header">
-        <div>
-            <select v-model="filterGenre" id="genre">
-                <option value="">Filter by Genre</option>
-                <option v-for="genre in genres" :value="genre">{{ genre }}</option>
-            </select>
-        </div>
-        <br>
       <span v-if="createPoll == 1">
         <button @click="plus"> + </button>
       </span>
@@ -382,7 +382,7 @@ async function toggleFavorite(pollID: string, index: number) {
       <h1 style="line-height: 100%;"> Click the + button to create a poll! </h1>
     </div>
   </span>
-  <div v-if="createPoll == 1 && filterGenre === 'Filter by Genre' || filterGenre === ''">
+  <div v-if="createPoll == 1 && (filterGenre === 'Filter by Genre' || filterGenre === '')">
         <div v-for="(poll, index) in publicPollData" :key="index">
             <span v-if="'pollQuestion' in poll">
             <h2 class="pollQuestion">
@@ -398,7 +398,7 @@ async function toggleFavorite(pollID: string, index: number) {
             </span>
         </div>
   </div>
-  <div v-if="createPoll == 1 && filterGenre !== 'Filter by Genre' || filterGenre !== ''">
+  <div v-if="createPoll == 1 && !(filterGenre === 'Filter by Genre' || filterGenre === '')">
         <div v-for="(poll, index) in publicPollData" :key="index">
             <span v-if="'pollQuestion' in poll && 'genre' in poll">
             <h2 class="pollQuestion" v-if="poll.genre === filterGenre">
@@ -415,7 +415,7 @@ async function toggleFavorite(pollID: string, index: number) {
     </div>
   </div>
   <div>
-    <button @click="scrollToTop" class="back-to-top">Back to top</button>
+    <button v-if="createPoll == 1" @click="scrollToTop" class="back-to-top">Back to top</button>
   </div>
 </template>
 
@@ -473,7 +473,7 @@ select {
   /* background-color: rgb(189, 189, 189); */
   transition: border-color 0.2s ease-in-out;
   width: 25%;
-  text-align: center; /* Add this line */
+  text-align: center;
 }
 
 
@@ -539,7 +539,7 @@ select {
   border-radius: 8px;
   border: 2px solid transparent;
   border-color: #3498db;
-  padding: 2%;
+  padding: 3%;
   display: inline-block;
   width: fit-content;
   justify-content: center;
