@@ -282,14 +282,21 @@ function scrollToTop() {
 // }
 
 async function optionsClick(pollID: string, index: number) {
-  const pollRef = doc(db, "polls/public/allPolls", pollID);
-  const pollDoc = await getDoc(pollRef);
+  const allPollRef = doc(db, "polls/public/allPolls", pollID);
+  const profRef = doc(db, "profile", newUserEmail);
+  const allPollDoc = await getDoc(allPollRef);
+  const profDoc = await getDoc(profRef);
 
-  if (pollDoc.exists()) {
-    const pollData = pollDoc.data();
-    if (pollData) {
-      pollData.votes[index]++;
-      await updateDoc(pollRef, pollData);
+  if (allPollDoc.exists() && profDoc.exists()) {
+    const allPollData = allPollDoc.data();
+    const profData = profDoc.data();
+    if (allPollData && profData) {
+        if (!profData.responded.includes(pollID)) {
+            allPollData.votes[index]++;
+            profData.responded.push(pollID);
+            await updateDoc(allPollRef, allPollData);
+            await updateDoc(profRef, profData);
+        }
     }
   }
 }
