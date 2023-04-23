@@ -71,7 +71,7 @@ auth.onAuthStateChanged(function (user: User | null) {
   if (user) {
     isLoggedIn.value = true // if we have a user
     userUid.value = user.uid; // store the user UID in the ref
-    console.log(`User UID: ${userUid.value}`);
+    // console.log(`User UID: ${userUid.value}`);
   } else {
     isLoggedIn.value = false // if we do not
     userUid.value = ''; // clear the user UID ref
@@ -81,18 +81,18 @@ auth.onAuthStateChanged(function (user: User | null) {
 async function logUserUid() {
   await new Promise<void>((resolve) => {
     watch(userEmail, (newValue, oldValue) => {
-      console.log(`userEmail changed from ${oldValue} to ${newValue}`);
+    //   console.log(`userEmail changed from ${oldValue} to ${newValue}`);
       newUserEmail = newValue;
       resolve();
     });
     watch(userUid, (newValue, oldValue) => {
-      console.log(`userUid changed from ${oldValue} to ${newValue}`);
+    //   console.log(`userUid changed from ${oldValue} to ${newValue}`);
       newUserUid = newValue;
       resolve();
     });
   });
 
-  console.log(`New userUid value: ${newUserUid}`);
+//   console.log(`New userUid value: ${newUserUid}`);
 }
 
 function setUserId(user: User | null) {
@@ -115,34 +115,47 @@ async function setFire(coll: DocumentReference, data: any) {
     console.log(`I got an error! ${error}`);
   }
 }
-// async function setFireUser(coll: DocumentReference, data: any) {
-//         try {
-//         await setDoc(coll, data);
-//             // await addDoc(collection(coll, email as string), data)
-//             console.log("Successful addition!");
-//         } catch (error) {
-//             console.log(`I got an error! ${error}`);
-//         }
-//     }
 
-/* Adds a new document */
-async function addFireUser(coll: DocumentReference, data: any) {
+
+async function addFirePublic(coll: DocumentReference, data: any) {
   try {
-    await addDoc(collection(coll, `${newUserUid}`), data)
+    const docRef = await addDoc(collection(coll, "allPolls"), data);
+    const pollId = docRef.id;
+    setCreated(pollId);
+    console.log("Added poll ID:", pollId);
+    getDocs(pollsPublicRef).then((pollsSnapshot) => {
+    const pollsPromises = pollsSnapshot.docs.map((pollsDoc) => {
+        return { ...pollsDoc.data(), id: pollsDoc.id };
+    });
+    return Promise.all(pollsPromises);
+    })
+    .then((pData) => {
+
+        for (let i = 0; i < pData.length; i++) {
+            publicPollData.value[i] = pData[i]
+        }
+        numPolls = pData.length; // Code to get number of documents in "allPolls" subcollection
+    })
+    .catch((err) => {
+        console.log(err.message);
+    });
     console.log("Successful addition!");
   } catch (error) {
     console.log(`I got an error! ${error}`);
   }
 }
 
-/* Adds a new document */
-async function addFirePublic(coll: DocumentReference, data: any) {
-  try {
-    await addDoc(collection(coll, "allPolls"), data)
-    console.log("Successful addition!");
-  } catch (error) {
-    console.log(`I got an error! ${error}`);
-  }
+
+async function setCreated(pollId: string) {
+    const profRef = doc(db, "profile", newUserEmail);
+    const profDoc = await getDoc(profRef);
+    if (profDoc.exists()) {
+        const profData = profDoc.data();
+        if (profData) {
+            profData.created.push(pollId);
+            await updateDoc(profRef, profData);
+        }
+    }
 }
 
 
@@ -168,11 +181,11 @@ getDocs(pollsPublicRef).then((pollsSnapshot) => {
     }
 
     // Access data from "allPolls" collection directly
-    if ('date' in pData[0]) {
-      console.log("PUBLIC DATE:", pData[0].date); // Code to get 'date' from document
-    }
+    // if ('date' in pData[0]) {
+    //   console.log("PUBLIC DATE:", pData[0].date); // Code to get 'date' from document
+    // }
     numPolls = pData.length; // Code to get number of documents in "allPolls" subcollection
-    console.log(numPolls); // Code to get 'date' from document
+    // console.log(numPolls); // Code to get 'date' from document
   })
   .catch((err) => {
     console.log(err.message);
@@ -209,7 +222,7 @@ getDocs(pollsPublicRef).then((pollsSnapshot) => {
 
 auth.onAuthStateChanged(setUserId);
 logUserUid();
-console.log(`New value ${newUserUid}`)
+// console.log(`New value ${newUserUid}`)
 
 function plus() {
   createPoll.value = 3 - createPoll.value;
@@ -258,7 +271,7 @@ async function post() {
   await Promise.all([
     addFirePublic(pollPublic, pollDataPublic),
   ]);
-  window.location.reload();
+//   window.location.reload();
 }
 
 function scrollToTop() {
