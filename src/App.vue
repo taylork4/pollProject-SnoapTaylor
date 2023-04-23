@@ -85,7 +85,7 @@ const signOut = () => {
         </span>
       </nav>
       <div class="email">
-        <span v-if= "$route.path !== '/Profile' && isLoggedIn">
+        <span v-if= "$route.path !== '/Profile' && $route.path !== '/' && isLoggedIn">
             <router-link to="/Profile"> Profile  </router-link>
         </span>
         <span v-if="$route.path !== '/Polls'  && $route.path !== '/Login' && $route.path !== '/SignUp'">
