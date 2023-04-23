@@ -32,11 +32,11 @@ let pollDataPublic: {
 }
 
 let prData: {
-    firstName: string;
-    lastName: string;
-    created: Array<string>;
-    responded: Array<string>;
-    favorited: Array<string>;
+  firstName: string;
+  lastName: string;
+  created: Array<string>;
+  responded: Array<string>;
+  favorited: Array<string>;
 }
 
 
@@ -57,7 +57,7 @@ let newUserEmail = "";
 let pollQ = ref("");
 let pollC = ref(["", "", "", ""]);
 const genres = ["Music", "Pop Culture", "Food", "Sports", "Random"]
-let filterGenre = ref ("");
+let filterGenre = ref("");
 let selectedGenre = ref("");
 let createPoll = ref(1);
 let option3 = ref(1);
@@ -81,18 +81,18 @@ auth.onAuthStateChanged(function (user: User | null) {
 async function logUserUid() {
   await new Promise<void>((resolve) => {
     watch(userEmail, (newValue, oldValue) => {
-    //   console.log(`userEmail changed from ${oldValue} to ${newValue}`);
+      //   console.log(`userEmail changed from ${oldValue} to ${newValue}`);
       newUserEmail = newValue;
       resolve();
     });
     watch(userUid, (newValue, oldValue) => {
-    //   console.log(`userUid changed from ${oldValue} to ${newValue}`);
+      //   console.log(`userUid changed from ${oldValue} to ${newValue}`);
       newUserUid = newValue;
       resolve();
     });
   });
 
-//   console.log(`New userUid value: ${newUserUid}`);
+  //   console.log(`New userUid value: ${newUserUid}`);
 }
 
 function setUserId(user: User | null) {
@@ -123,21 +123,21 @@ async function addFirePublic(coll: DocumentReference, data: any) {
     const pollId = docRef.id;
     setCreated(pollId);
     getDocs(pollsPublicRef).then((pollsSnapshot) => {
-    const pollsPromises = pollsSnapshot.docs.map((pollsDoc) => {
+      const pollsPromises = pollsSnapshot.docs.map((pollsDoc) => {
         return { ...pollsDoc.data(), id: pollsDoc.id };
-    });
-    return Promise.all(pollsPromises);
+      });
+      return Promise.all(pollsPromises);
     })
-    .then((pData) => {
+      .then((pData) => {
 
         for (let i = 0; i < pData.length; i++) {
-            publicPollData.value[i] = pData[i]
+          publicPollData.value[i] = pData[i]
         }
         numPolls = pData.length; // Code to get number of documents in "allPolls" subcollection
-    })
-    .catch((err) => {
+      })
+      .catch((err) => {
         console.log(err.message);
-    });
+      });
     console.log("Successful addition!");
   } catch (error) {
     console.log(`I got an error! ${error}`);
@@ -146,15 +146,15 @@ async function addFirePublic(coll: DocumentReference, data: any) {
 
 
 async function setCreated(pollId: string) {
-    const profRef = doc(db, "profile", newUserEmail);
-    const profDoc = await getDoc(profRef);
-    if (profDoc.exists()) {
-        const profData = profDoc.data();
-        if (profData) {
-            profData.created.push(pollId);
-            await updateDoc(profRef, profData);
-        }
+  const profRef = doc(db, "profile", newUserEmail);
+  const profDoc = await getDoc(profRef);
+  if (profDoc.exists()) {
+    const profData = profDoc.data();
+    if (profData) {
+      profData.created.push(pollId);
+      await updateDoc(profRef, profData);
     }
+  }
 }
 
 
@@ -270,7 +270,7 @@ async function post() {
   await Promise.all([
     addFirePublic(pollPublic, pollDataPublic),
   ]);
-//   window.location.reload();
+  //   window.location.reload();
 }
 
 function scrollToTop() {
@@ -303,34 +303,34 @@ async function optionsClick(pollID: string, index: number) {
     const allPollData = allPollDoc.data();
     const profData = profDoc.data();
     if (allPollData && profData) {
-        if (!profData.responded.includes(pollID)) {
-            allPollData.votes[index]++;
-            profData.responded.push(pollID);
-            await updateDoc(allPollRef, allPollData);
-            await updateDoc(profRef, profData);
-        }
+      if (!profData.responded.includes(pollID)) {
+        allPollData.votes[index]++;
+        profData.responded.push(pollID);
+        await updateDoc(allPollRef, allPollData);
+        await updateDoc(profRef, profData);
+      }
     }
   }
 }
 
 async function toggleFavorite(pollID: string, index: number) {
-    const pollRef = doc(db, "profile", newUserEmail);
-    const pollDoc = await getDoc(pollRef);
+  const pollRef = doc(db, "profile", newUserEmail);
+  const pollDoc = await getDoc(pollRef);
 
-    if (pollDoc.exists()) {
-        const pollData = pollDoc.data();
-        if (pollData) {
-            if (!pollData.favorited.includes(pollID)) {
-                pollData.favorited.push(pollID);
-                await updateDoc(pollRef, pollData);
-            } else {
-                pollData.favorited = pollData.favorited.filter((id: any) => id !== pollID);
-                await updateDoc(pollRef, pollData);
-            }
-        }
+  if (pollDoc.exists()) {
+    const pollData = pollDoc.data();
+    if (pollData) {
+      if (!pollData.favorited.includes(pollID)) {
+        pollData.favorited.push(pollID);
+        await updateDoc(pollRef, pollData);
+      } else {
+        pollData.favorited = pollData.favorited.filter((id: any) => id !== pollID);
+        await updateDoc(pollRef, pollData);
+      }
     }
+  }
 }
- 
+
 
 </script>
 
@@ -395,32 +395,34 @@ async function toggleFavorite(pollID: string, index: number) {
     </div>
   </span>
   <div v-if="createPoll == 1 && (filterGenre === 'Filter by Genre' || filterGenre === '')">
-        <div v-for="(poll, index) in publicPollData" :key="index">
-            <span v-if="'pollQuestion' in poll">
-            <h2 class="pollQuestion">
-                <span class="star"  @click="toggleFavorite(poll.id, index)">&#9734;</span>
-                {{ poll.pollQuestion }}
-            </h2>
-            </span>
-            <span v-if="'pollChoices' in poll">
-            <div v-for="(options, index) in poll.pollChoices">
-                <button @click="optionsClick(poll.id, index)" class="pollButtons" v-if="options !== ''">{{ options }}</button>
-            </div>
-            <br>
-            </span>
+    <div v-for="(poll, index) in publicPollData" :key="index">
+      <span v-if="'pollQuestion' in poll">
+        <h2 class="pollQuestion">
+          <span class="star" @click="toggleFavorite(poll.id, index)">&#9734;</span>
+          {{ poll.pollQuestion }}
+        </h2>
+      </span>
+      <span v-if="'pollChoices' in poll">
+        <div v-for="(options, index) in poll.pollChoices">
+          <button @click="optionsClick(poll.id, index)" class="pollButtons" v-if="options !== ''">{{ options }}</button>
+          <p style="display: inline-block; margin-left: 10px;" v-if="options !== ''">{{ (100*(poll.votes[index] / (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
         </div>
+        <br>
+      </span>
+    </div>
   </div>
   <div v-if="createPoll == 1 && !(filterGenre === 'Filter by Genre' || filterGenre === '')">
-        <div v-for="(poll, index) in publicPollData" :key="index">
-            <span v-if="'pollQuestion' in poll && 'genre' in poll">
-            <h2 class="pollQuestion" v-if="poll.genre === filterGenre">
-                <span class="star" @click="toggleFavorite(poll.id, index)">&#9734;</span>
-                {{ poll.pollQuestion }}
-            </h2>
-            </span>
-      <span v-if="'pollChoices' in poll && 'genre' in poll">
-        <div v-for="(options, index) in poll.pollChoices" v-if="poll.genre === filterGenre ">
+    <div v-for="(poll, index) in publicPollData" :key="index">
+      <span v-if="'pollQuestion' in poll && 'genre' in poll">
+        <h2 class="pollQuestion" v-if="poll.genre === filterGenre">
+          <span class="star" @click="toggleFavorite(poll.id, index)">&#9734;</span>
+          {{ poll.pollQuestion }}
+        </h2>
+      </span>
+      <span v-if="'pollChoices' in poll && 'genre' in poll && 'votes' in poll">
+        <div v-for="(options, index) in poll.pollChoices" v-if="poll.genre === filterGenre">
           <button @click="optionsClick(poll.id, index)" class="pollButtons" v-if="options !== ''">{{ options }}</button>
+          <p style="display: inline-block; margin-left: 10px;" v-if="options !== ''">{{ (100*(poll.votes[index] / (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
         </div>
         <br>
       </span>
@@ -557,7 +559,7 @@ select {
   justify-content: center;
   margin-top: 5%;
   color: rgb(0, 0, 0);
-  position: relative; /* make the position of the container element relative */
+  position: relative;
+  /* make the position of the container element relative */
 }
-
 </style>
