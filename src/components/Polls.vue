@@ -241,18 +241,19 @@ function scrollToTop() {
   });
 }
 
-async function optionsClick(pollID: string, index: number) {  
-  // Increment the vote count for the selected option
-  pollDataPublic.votes[index]++;
-  // Update the document in Firestore
-  try {
-    const pollDocRef = doc(db, 'polls/public/allPolls', pollID);
-    await updateDoc(pollDocRef, { votes: pollDataPublic.votes });
-    console.log('Document updated successfully!');
-  } catch (error) {
-    console.log(`Error updating document: ${error}`);
+async function optionsClick(pollID: string, index: number) {
+  const pollRef = doc(db, "polls/public/allPolls", pollID);
+  const pollDoc = await getDoc(pollRef);
+
+  if (pollDoc.exists()) {
+    const pollData = pollDoc.data();
+    if (pollData) {
+      pollData.votes[index]++;
+      await updateDoc(pollRef, pollData);
+    }
   }
 }
+ 
 
 </script>
 
