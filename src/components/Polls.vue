@@ -28,7 +28,15 @@ let pollDataPublic: {
   pollChoices: ["", "", "", ""],
   votes: [0, 0, 0, 0],
   date: "",
-  genre: "",
+  genre: ""
+}
+
+let prData: {
+    firstName: string;
+    lastName: string;
+    created: Array<string>;
+    responded: Array<string>;
+    favorited: Array<string>;
 }
 
 
@@ -42,11 +50,14 @@ const route = useRoute() as CurrentRoute;
 const email = route.query.email;
 
 const userUid = ref('');
+const userEmail = ref('');
 let usId = "";
 let newUserUid = "";
+let newUserEmail = "";
 let pollQ = ref("");
 let pollC = ref(["", "", "", ""]);
 const genres = ["Music", "Pop Culture", "Food", "Sports", "Random"]
+let filterGenre = ref ("");
 let selectedGenre = ref("");
 let createPoll = ref(1);
 let option3 = ref(1);
@@ -69,6 +80,11 @@ auth.onAuthStateChanged(function (user: User | null) {
 
 async function logUserUid() {
   await new Promise<void>((resolve) => {
+    watch(userEmail, (newValue, oldValue) => {
+      console.log(`userEmail changed from ${oldValue} to ${newValue}`);
+      newUserEmail = newValue;
+      resolve();
+    });
     watch(userUid, (newValue, oldValue) => {
       console.log(`userUid changed from ${oldValue} to ${newValue}`);
       newUserUid = newValue;
@@ -83,8 +99,10 @@ function setUserId(user: User | null) {
   if (user) {
     userUid.value = user.uid;
     usId = user.uid;
+    userEmail.value = user.email || '';
   } else {
     userUid.value = '';
+    userEmail.value = '';
     usId = '';
   }
 }
@@ -97,6 +115,15 @@ async function setFire(coll: DocumentReference, data: any) {
     console.log(`I got an error! ${error}`);
   }
 }
+// async function setFireUser(coll: DocumentReference, data: any) {
+//         try {
+//         await setDoc(coll, data);
+//             // await addDoc(collection(coll, email as string), data)
+//             console.log("Successful addition!");
+//         } catch (error) {
+//             console.log(`I got an error! ${error}`);
+//         }
+//     }
 
 /* Adds a new document */
 async function addFireUser(coll: DocumentReference, data: any) {
@@ -253,6 +280,10 @@ async function optionsClick(pollID: string, index: number) {
     }
   }
 }
+
+function toggleFavorite(index: number) {
+
+}
  
 
 </script>
@@ -260,6 +291,13 @@ async function optionsClick(pollID: string, index: number) {
 <template>
   <span v-if="isLoggedIn">
     <div class="header">
+        <div>
+            <select v-model="filterGenre" id="genre">
+                <option value="">Filter by Genre</option>
+                <option v-for="genre in genres" :value="genre">{{ genre }}</option>
+            </select>
+        </div>
+        <br>
       <span v-if="createPoll == 1">
         <button @click="plus"> + </button>
       </span>
@@ -282,7 +320,6 @@ async function optionsClick(pollID: string, index: number) {
             <input style="margin-right: 20px; margin-left: 66px;" type="text" placeholder="Poll Answer" v-model="pollC[2]"
               class="answer" />
             <button @click="op3"> - </button>
-
           </div>
           <br>
         </span>
@@ -309,24 +346,42 @@ async function optionsClick(pollID: string, index: number) {
     </div>
     <div v-if="createPoll == 1">
       <h1 style="line-height: 100%;"> Click the + button to create a poll! </h1>
-      <div>
-        <button @click="scrollToTop" class="back-to-top">Back to top</button>
-      </div>
     </div>
   </span>
-  <div v-if="createPoll == 1">
-    <div v-for="(poll, index) in publicPollData" :key="index">
-      <span v-if="'pollQuestion' in poll">
-        <h2 class="pollQuestion">{{ poll.pollQuestion }}</h2>
-      </span>
-      <span v-if="'pollChoices' in poll">
-        <div v-for="(options, index) in poll.pollChoices">
+  <div v-if="createPoll == 1 && filterGenre === 'Filter by Genre' || filterGenre === ''">
+        <div v-for="(poll, index) in publicPollData" :key="index">
+            <span v-if="'pollQuestion' in poll">
+            <h2 class="pollQuestion">
+                <span class="star" @click="toggleFavorite(index)">&#9734;</span>
+                {{ poll.pollQuestion }}
+            </h2>
+            </span>
+            <span v-if="'pollChoices' in poll">
+            <div v-for="(options, index) in poll.pollChoices">
+                <button @click="optionsClick(poll.id, index)" class="pollButtons" v-if="options !== ''">{{ options }}</button>
+            </div>
+            <br>
+            </span>
+        </div>
+  </div>
+  <div v-if="createPoll == 1 && filterGenre !== 'Filter by Genre' || filterGenre !== ''">
+        <div v-for="(poll, index) in publicPollData" :key="index">
+            <span v-if="'pollQuestion' in poll && 'genre' in poll">
+            <h2 class="pollQuestion" v-if="poll.genre === filterGenre">
+                <span class="star" @click="toggleFavorite(index)">&#9734;</span>
+                {{ poll.pollQuestion }}
+            </h2>
+            </span>
+      <span v-if="'pollChoices' in poll && 'genre' in poll">
+        <div v-for="(options, index) in poll.pollChoices" v-if="poll.genre === filterGenre ">
           <button @click="optionsClick(poll.id, index)" class="pollButtons" v-if="options !== ''">{{ options }}</button>
         </div>
-
         <br>
       </span>
     </div>
+  </div>
+  <div>
+    <button @click="scrollToTop" class="back-to-top">Back to top</button>
   </div>
 </template>
 
@@ -352,6 +407,22 @@ async function optionsClick(pollID: string, index: number) {
   width: 100%;
 }
 
+.star {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: black;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 1%;
+}
+
+.star.favorite {
+  color: gold;
+  cursor: pointer;
+  padding: 1%;
+}
+
 .question:hover,
 .question:focus {
   border-color: #1abc9c;
@@ -368,8 +439,7 @@ select {
   /* background-color: rgb(189, 189, 189); */
   transition: border-color 0.2s ease-in-out;
   width: 25%;
-  text-align: center;
-  /* Add this line */
+  text-align: center; /* Add this line */
 }
 
 
@@ -435,10 +505,13 @@ select {
   border-radius: 8px;
   border: 2px solid transparent;
   border-color: #3498db;
-  padding: 1.5%;
+  padding: 2%;
   display: inline-block;
   width: fit-content;
   justify-content: center;
   margin-top: 5%;
   color: rgb(0, 0, 0);
-}</style>
+  position: relative; /* make the position of the container element relative */
+}
+
+</style>

@@ -29,8 +29,11 @@ let newUserUid = "";
 let newUserEmail = "";
 
 let prData: {
-  firstName: string;
-  lastName: string;
+    firstName: string;
+    lastName: string;
+    created: Array<string>;
+    responded: Array<string>;
+    favorited: Array<string>;
 }
 
 async function fetchData(em: string) {

@@ -12,9 +12,15 @@ const router = useRouter();
     let prData: {
         firstName: string;
         lastName: string;
+        created: Array<string>;
+        responded: Array<string>;
+        favorited: Array<string>;
     } = {
         firstName: "",
         lastName: "",
+        created: [""],
+        responded: [""],
+        favorited: [""]
     }
 
     const email = ref('');
