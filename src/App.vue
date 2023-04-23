@@ -99,8 +99,14 @@ const signOut = () => {
       Cameron Snoap<br>
       Kyle Taylor
     </h4>
-    <h2> <br> Click <u>Sign Up</u> if you don't already have an account! </h2>
-    <h2> Or, click <u>Login</u> if you do! </h2>
+    <span v-if="!isLoggedIn">
+        <h2> <br> Click <u>Sign Up</u> if you don't already have an account! </h2>
+        <h2> Or, click <u>Login</u> if you do! </h2>
+    </span>
+    <span v-if="isLoggedIn">
+        <h1> <br> Click <u>Polls</u> in the top right corner to </h1>
+        <h1> start making some awesome polls! </h1>
+    </span>
   </div>
   <router-view />
 </template>
