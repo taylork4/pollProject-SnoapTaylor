@@ -296,13 +296,23 @@ function cn(val: any) {
       </span>
     </div>
   </div>
-  <div v-if="(filterSelection === 'Statistics')">'
+  <div v-if="(filterSelection === 'Statistics')">
   <div class="chart">
-    <button class="bar fav-bar" v-bind:style="{ height: favPer + '%' }">{{ fav.length }}</button>
-    <button class="bar cr-bar" v-bind:style="{ height: crPer + '%' }">{{ cr.length }}</button>
-    <button class="bar resp-bar" v-bind:style="{ height: respPer + '%' }">{{ resp.length }}</button>
+    <div class="bar-container">
+      <button class="bar fav-bar" v-bind:style="{ height: favPer + '%' }">{{ fav.length }}</button>
+      <div class="label">Favorites</div>
+    </div>
+    <div class="bar-container">
+      <button class="bar cr-bar" v-bind:style="{ height: crPer + '%' }">{{ cr.length }}</button>
+      <div class="label">Created</div>
+    </div>
+    <div class="bar-container">
+      <button class="bar resp-bar" v-bind:style="{ height: respPer + '%' }">{{ resp.length }}</button>
+      <div class="label">Responded</div>
+    </div>
   </div>
 </div>
+
 </template>  
 
 <style scoped>
@@ -327,56 +337,73 @@ function cn(val: any) {
  }
 
  .chart {
-display: flex;
-align-items: flex-end;
-justify-content: center;
-height: 300px;
-margin: 20px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 400px; /* adjust as needed */
+  margin: 20px;
 }
 
+.bar-container {
+  display: flex;
+  flex-direction: column;
+  height: 300px;
+  align-items: center;
+  justify-content: flex-end;
+  margin: 0 75px;
+  font-weight: bold;
+}
+
+
 .bar {
-width: 100px;
-border-radius: 5px;
-margin: 0 30px;
-color: white;
-font-weight: bold;
-font-size: 16px;
-text-transform: uppercase;
-transition: all 0.3s ease-in-out;
-color: black;
+  width: 300px;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 20px;
+  text-transform: uppercase;
+  transition: all 0.3s ease-in-out;
+  color: black;
+  padding-bottom: 40px;
 }
 
 .fav-bar {
-background-color: #FFC857;
+  background-color: #FFC857;
 }
 
 .cr-bar {
-background-color: #E9724C;
+  background-color: #E9724C;
 }
 
 .resp-bar {
-background-color: #C5283D;
+  background-color: #C5283D;
 }
 
 .chart::after {
-content: "";
-display: block;
-height: 5px;
-background-color: #333;
-margin-top: 10px;
+  content: "";
+  display: block;
+  height: 5px;
+  background-color: #333;
+  margin-top: 10px;
+}
+
+.label {
+  margin-top: 10px;
+  font-size: 40px;
+  text-align: center;
 }
 
 /* Hover effect */
 .bar:hover {
-transform: translateY(-5px);
-box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
+  transform: translateY(-5px);
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
 }
 
 /* Active effect */
 .bar:active {
-transform: translateY(0);
-box-shadow: none;
+  transform: translateY(0);
+  box-shadow: none;
 }
+
 
  .question {
   border-radius: 8px;
