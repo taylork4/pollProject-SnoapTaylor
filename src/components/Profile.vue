@@ -9,6 +9,9 @@ import { useRoute, RouteLocationNormalized } from 'vue-router';
 import 'firebase/firestore';
 import {collection, addDoc, updateDoc, DocumentReference, DocumentSnapshot, setDoc, doc, getDoc, getDocs, CollectionReference, query, collectionGroup, QuerySnapshot, where, QueryDocumentSnapshot, deleteDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase/init.js'
+
+
+
 const dt = new Date();
 
 const dt_string = dt.toLocaleString();
@@ -141,6 +144,9 @@ let ln = ref('');
 let fav = ref<string[]>([]);
 let cr = ref<string[]>([]);
 let resp = ref<string[]>([]);
+let favPer = ref(0);
+let crPer = ref(0);
+let respPer = ref(0);
 // let lastName = ref("");
 function dataAnalysis(data: any) {
     fn.value = data.firstName; // Read 'firstName' field
@@ -148,7 +154,18 @@ function dataAnalysis(data: any) {
     fav.value = data.favorited;
     cr.value = data.created;
     resp.value = data.responded;
-    // console.log("Favorites: ", fav.value.slice());
+
+    // Get the total sum of all values
+    const totalSum = fav.value.length + cr.value.length + resp.value.length;
+
+    // Calculate the percentages
+    favPer.value = fav.value.length / totalSum * 100;
+    crPer.value = cr.value.length / totalSum * 100;
+    respPer.value = resp.value.length / totalSum * 100;
+
+    console.log("FavPer", favPer.value)
+    console.log("crPer", crPer.value)
+    console.log("respPer", respPer.value)
     
     
     const userIdElement = document.getElementById("userId");
@@ -208,8 +225,6 @@ function cn(val: any) {
         <h2 id="email"></h2>
         <h2 id="userId"></h2>
     </div>
-    
-    
     <div v-if="(filterSelection === 'Filter by' || filterSelection === '')">
         <div v-for="(poll, index) in publicPollData" :key="index">
             <span v-if="'pollQuestion' in poll && 'genre' in poll && (fav.includes(poll.id) || resp.includes(poll.id) || cr.includes(poll.id))">
@@ -278,11 +293,16 @@ function cn(val: any) {
           <button class="pollButtons" v-if="options !== ''  && resp.includes(poll.id)">{{ options }}</button>
           <p style="display: inline-block; margin-left: 10px;" v-if="options !== '' && Array.isArray(poll.votes)  && resp.includes(poll.id)">{{ (100*(poll.votes[index] / (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
         </div>
-        
       </span>
     </div>
   </div>
-  <!-- <img src="./assets/profIcon.png" alt=""> -->
+  <div v-if="(filterSelection === 'Statistics')">'
+    <div class="chart">
+        <button class="bar" v-bind:style="{ height: favPer + '%' }">{{ fav.length }}</button>
+        <button class="bar" v-bind:style="{ height: crPer + '%' }">{{ cr.length }}</button>
+        <button class="bar" v-bind:style="{ height: respPer + '%' }">{{ resp.length }}</button>
+    </div>
+  </div>
 </template>  
 
 <style scoped>
@@ -305,6 +325,28 @@ function cn(val: any) {
    color: black;
    background-color: white;
  }
+
+ .chart {
+  display: flex;
+  align-items: flex-end;
+  height: 300px;
+  margin: 20px;
+}
+
+.bar {
+  width: 50px;
+  background-color: #4CAF50;
+  border-radius: 5px;
+  margin: 0 10px;
+}
+
+.chart::after {
+  content: "";
+  display: block;
+  height: 5px;
+  background-color: #333;
+  margin-top: 10px;
+}
 
  .question {
   border-radius: 8px;

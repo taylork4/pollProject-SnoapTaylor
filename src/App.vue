@@ -79,7 +79,6 @@ const signOut = () => {
           <button @click="signOut"> Logout </button>
         </span>
         <span v-else>
-          <!-- <router-link to="/"> Home </router-link> | -->
           <router-link to="/SignUp"> Sign Up </router-link> |
           <router-link to="/Login"> Login </router-link>
         </span>
@@ -109,6 +108,9 @@ const signOut = () => {
     </span>
   </div>
   <router-view />
+  <div id="app">
+    <PlanetChart/>
+  </div>
 </template>
 
 <style>
