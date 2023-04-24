@@ -392,19 +392,19 @@ async function toggleFavorite(pollID: string, index: number) {
             <button @click="op3"> - </button>
           </div>
         </span>
-        <span v-if="option4 == 1 && option3 == 2">
-          <button @click="op4"> + </button>          
+        <span style="margin-top: 20px" v-if="option4 == 1 && option3 == 2">
+          <button style="margin-top: 20px" @click="op4"> + </button>          
         </span>
-        <span v-if="option4 == 2">
+        <span style="margin-top: 20px" v-if="option4 == 2">
           <div>
             <input style="margin-right: 20px; margin-left: 66px;" type="text" placeholder="Poll Answer" v-model="pollC[3]"
               class="answer" />
-            <button @click="op4"> - </button>
+            <button style="margin-top: 20px;" @click="op4"> - </button>
           </div>
         </span> 
         <div class="header"
           v-if="!(pollC[0] === '' || pollC[1] === '' || pollQ === '' || selectedGenre === 'Select a genre' || selectedGenre === '')">
-          <button @click="post"> Post </button>
+          <button style="margin-top: 20px" @click="post"> Post </button>
         </div>
       </span>
     </div>
