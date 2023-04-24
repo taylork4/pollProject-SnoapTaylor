@@ -28,7 +28,7 @@ let usId = "";
 let newUserUid = "";
 let newUserEmail = "";
 const filterOptions = ["Favorited Polls  ⭐", "Polls Responded To", "Polls Created", "Statistics"]
-let filterSelection = ref ("");
+let filterSelection = ref("");
 let numPolls: number = 0;
 
 let prData: {
@@ -136,23 +136,23 @@ function setUserId(user: User | null) {
 auth.onAuthStateChanged(setUserId);
 logUserUid();
 console.log(`New value ${newUserUid}`)
+let fn = ref('');
+let ln = ref('');
+let fav = ref<string[]>([]);
+// let lastName = ref("");
 function dataAnalysis(data: any) {
-    const firstName = data.firstName; // Read 'firstName' field
-    const lastName = data.lastName; // Read 'lastName' field
-
-    console.log("First Name:", firstName);
-    console.log("Last Name:", lastName);
+    fn.value = data.firstName; // Read 'firstName' field
+    ln.value = data.lastName;
+    fav.value = data.favorited;
+    // console.log("Favorites: ", fav.value.slice());
+    
     
     const userIdElement = document.getElementById("userId");
     const emailElement = document.getElementById("email");
-    const firstNameElement = document.getElementById("firstName");
-    const lastNameElement = document.getElementById("lastName");
     // Update the UI with the data
-    if (firstNameElement && lastNameElement && userIdElement && emailElement) {
+    if (userIdElement && emailElement) {
         userIdElement.textContent = "User ID: " + newUserUid
         emailElement.textContent = "Email: " + newUserEmail
-        firstNameElement.textContent = "First Name: " + firstName;
-        lastNameElement.textContent = "Last Name: " + lastName;
     }
 }
 
@@ -184,20 +184,23 @@ async function deletePoll(pollID: string, index: number) {
     }
 }
 
+function cn(val: any) {
+    console.log(val);
+}
 </script>
 
 <template>
   <span class="header">
     <select v-model="filterSelection">
       <option value="">Filter by</option>
-      <option v-for="ops in filterOptions" :value="filterOptions">{{ ops }}</option>
+      <option v-for="ops in filterOptions" :value="ops">{{ ops }}</option>
     </select>
   </span>
     <br>
     <div class="report">
         <h1> This is your profile! </h1>
-        <h2 id="firstName"></h2>
-        <h2 id="lastName"></h2>
+        <h2> First Name: {{ fn }} </h2>
+        <h2> Last Name: {{ ln }}</h2>
         <h2 id="email"></h2>
         <h2 id="userId"></h2>
     </div>
@@ -220,9 +223,8 @@ async function deletePoll(pollID: string, index: number) {
       </span>
     </div>
   </div>
-  <div v-if="(filterSelection === 'Favorited Polls  ⭐')">
+  <div v-if="(filterSelection === 'Statistics')">
         <div v-for="(poll, index) in publicPollData" :key="index">
-            
             <span v-if="'pollQuestion' in poll">
             <h2 class="pollQuestion">
                 <span class="star" @click="toggleFavorite(poll.id, index)">&#9734;</span>
@@ -233,6 +235,24 @@ async function deletePoll(pollID: string, index: number) {
       <span v-if="'pollChoices' in poll && 'genre' in poll">
         <div v-for="(options, index) in poll.pollChoices">
           <button class="pollButtons" v-if="options !== ''">{{ options }}</button>
+        </div>
+        <br>
+      </span>
+    </div>
+  </div>
+  <div v-if="(filterSelection === 'Favorited Polls  ⭐')">
+        <div v-for="(poll, index) in publicPollData" :key="index">
+            <span v-if="'pollQuestion' in poll && fav.includes(poll.id)">
+                <h2>{{ cn(fav) }}</h2>
+            <h2 class="pollQuestion">
+                <span class="star" @click="toggleFavorite(poll.id, index)">&#9734;</span>
+                <span class="delete" @click="deletePoll(poll.id, index)"> × </span>
+                    {{ poll.pollQuestion }}
+            </h2>
+            </span>
+      <span v-if="'pollChoices' in poll && 'genre' in poll">
+        <div v-for="(options, index) in poll.pollChoices">
+          <button class="pollButtons" v-if="options !== '' && fav.includes(poll.id)">{{ options }}</button>
         </div>
         <br>
       </span>
