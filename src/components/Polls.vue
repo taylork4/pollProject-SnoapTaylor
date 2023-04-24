@@ -270,7 +270,6 @@ async function post() {
   await Promise.all([
     addFirePublic(pollPublic, pollDataPublic),
   ]);
-    window.location.reload();
 }
 
 function scrollToTop() {
