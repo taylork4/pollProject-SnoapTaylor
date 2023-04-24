@@ -4,26 +4,11 @@
 -------------------------------------------------------------------*/
 // Import the functions you need from the SDKs you need
 import { User } from "firebase/auth";
-import { ref, defineProps, computed, withDefaults, Ref, watch } from "vue"
-import { useRoute, RouteLocationNormalized } from 'vue-router';
+import { ref, watch } from "vue"
+import { RouteLocationNormalized } from 'vue-router';
 import 'firebase/firestore';
-import {collection, addDoc, updateDoc, DocumentReference, DocumentSnapshot, setDoc, doc, getDoc, getDocs, CollectionReference, query, collectionGroup, QuerySnapshot, where, QueryDocumentSnapshot, deleteDoc } from 'firebase/firestore';
+import { collection, updateDoc, doc, getDoc, getDocs, CollectionReference, query, collectionGroup, QuerySnapshot, where, QueryDocumentSnapshot, deleteDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase/init.js'
-
-
-
-const dt = new Date();
-
-const dt_string = dt.toLocaleString();
-
-// define the type for the current route object
-interface CurrentRoute extends RouteLocationNormalized {
-  query: {
-    email?: string;
-  };
-}
-const route = useRoute() as CurrentRoute;
-const email = route.query.email;
 
 const userUid = ref('');
 const userEmail = ref('');
@@ -34,14 +19,6 @@ const filterOptions = ["Favorited Polls  ⭐", "Polls Responded To", "Polls Crea
 let filterSelection = ref("");
 let numPolls: number = 0;
 
-let prData: {
-    firstName: string;
-    lastName: string;
-    created: Array<string>;
-    responded: Array<string>;
-    favorited: Array<string>;
-}
-
 async function fetchData(em: string) {
   const docRef = doc(db, "profile", em);
   const docSnap = await getDoc(docRef);
@@ -49,7 +26,7 @@ async function fetchData(em: string) {
   if (docSnap.exists()) {
     const data = docSnap.data();
     if (data) {
-        dataAnalysis(data);
+      dataAnalysis(data);
     } else {
       console.log("No data found in document!");
     }
@@ -57,7 +34,6 @@ async function fetchData(em: string) {
     console.log("No such document!");
   }
 }
-
 
 const pollsPublicRef = collection(db, "polls/public/allPolls"); // Update collection reference to "allPolls"
 interface PollData {
@@ -91,22 +67,20 @@ getDocs(pollsPublicRef).then((pollsSnapshot) => {
     console.log(err.message);
   });
 
-
 const isLoggedIn = ref(true)
-  // runs after firebase is initialized
-  auth.onAuthStateChanged(function(user: User | null) {
-      if (user) {
-        isLoggedIn.value = true // if we have a user
-        userUid.value = user.uid; // store the user UID in the ref
-        console.log(`User UID: ${userUid.value}`);        
-      } else {
-        isLoggedIn.value = false // if we do not
-        userUid.value = ''; // clear the user UID ref
-      }
-  })
+// runs after firebase is initialized
+auth.onAuthStateChanged(function (user: User | null) {
+  if (user) {
+    isLoggedIn.value = true // if we have a user
+    userUid.value = user.uid; // store the user UID in the ref
+    console.log(`User UID: ${userUid.value}`);
+  } else {
+    isLoggedIn.value = false // if we do not
+    userUid.value = ''; // clear the user UID ref
+  }
+})
 
-  
-  async function logUserUid() {
+async function logUserUid() {
   await new Promise<void>((resolve) => {
     watch(userEmail, (newValue, oldValue) => {
       console.log(`userEmail changed from ${oldValue} to ${newValue}`);
@@ -149,65 +123,68 @@ let crPer = ref(0);
 let respPer = ref(0);
 // let lastName = ref("");
 function dataAnalysis(data: any) {
-    fn.value = data.firstName; // Read 'firstName' field
-    ln.value = data.lastName;
-    fav.value = data.favorited;
-    cr.value = data.created;
-    resp.value = data.responded;
+  fn.value = data.firstName; // Read 'firstName' field
+  ln.value = data.lastName;
+  fav.value = data.favorited;
+  cr.value = data.created;
+  resp.value = data.responded;
 
-    // Get the total sum of all values
-    const totalSum = fav.value.length + cr.value.length + resp.value.length;
+  // Get the total sum of all values
+  const totalSum = fav.value.length + cr.value.length + resp.value.length;
 
-    // Calculate the percentages
-    favPer.value = fav.value.length / totalSum * 100;
-    crPer.value = cr.value.length / totalSum * 100;
-    respPer.value = resp.value.length / totalSum * 100;
+  // Calculate the percentages
+  favPer.value = fav.value.length / totalSum * 100;
+  crPer.value = cr.value.length / totalSum * 100;
+  respPer.value = resp.value.length / totalSum * 100;
 
-    console.log("FavPer", favPer.value)
-    console.log("crPer", crPer.value)
-    console.log("respPer", respPer.value)
-    
-    
-    const userIdElement = document.getElementById("userId");
-    const emailElement = document.getElementById("email");
-    // Update the UI with the data
-    if (userIdElement && emailElement) {
-        userIdElement.textContent = "User ID: " + newUserUid
-        emailElement.textContent = "Email: " + newUserEmail
-    }
+  const userIdElement = document.getElementById("userId");
+  const emailElement = document.getElementById("email");
+  // Update the UI with the data
+  if (userIdElement && emailElement) {
+    userIdElement.textContent = "User ID: " + newUserUid
+    emailElement.textContent = "Email: " + newUserEmail
+  }
 }
 
 async function toggleFavorite(pollID: string, index: number) {
-    const pollRef = doc(db, "profile", newUserEmail);
-    const pollDoc = await getDoc(pollRef);
+  const pollRef = doc(db, "profile", newUserEmail);
+  const pollDoc = await getDoc(pollRef);
 
-    if (pollDoc.exists()) {
-        const pollData = pollDoc.data();
-        if (pollData) {
-            if (!pollData.favorited.includes(pollID)) {
-                pollData.favorited.push(pollID);
-                await updateDoc(pollRef, pollData);
-            } else {
-                pollData.favorited = pollData.favorited.filter((id: any) => id !== pollID);
-                await updateDoc(pollRef, pollData);
-            }
-        }
+  if (pollDoc.exists()) {
+    const pollData = pollDoc.data();
+    if (pollData) {
+      if (!pollData.favorited.includes(pollID)) {
+        pollData.favorited.push(pollID);
+        await updateDoc(pollRef, pollData);
+      } else {
+        pollData.favorited = pollData.favorited.filter((id: any) => id !== pollID);
+        await updateDoc(pollRef, pollData);
+      }
     }
+  }
 }
 
 async function deletePoll(pollID: string, index: number) {
-    const allPollRef = doc(db, "polls/public/allPolls", pollID);
-    const allPollDoc = await getDoc(allPollRef);
-    if (confirm("Are you sure you want to delete your poll?")) {
-        if (allPollDoc.exists()) {
-            await deleteDoc(allPollRef);
-        }
+  const allPollRef = doc(db, "polls/public/allPolls", pollID);
+  const allPollDoc = await getDoc(allPollRef);
+  if (confirm("Are you sure you want to delete your poll?")) {
+    if (allPollDoc.exists()) {
+      await deleteDoc(allPollRef);
     }
+  }
 }
 
 function cn(val: any) {
-    console.log(val);
+  console.log(val);
 }
+
+function scrollToTop() {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
 </script>
 
 <template>
@@ -217,130 +194,158 @@ function cn(val: any) {
       <option v-for="ops in filterOptions" :value="ops">{{ ops }}</option>
     </select>
   </span>
-    
-    <div class="report">
-        <h1> This is your profile! </h1>
-        <h2> First Name: {{ fn }} </h2>
-        <h2> Last Name: {{ ln }}</h2>
-        <h2 id="email"></h2>
-        <h2 id="userId"></h2>
-    </div>
-    <div v-if="(filterSelection === 'Filter by' || filterSelection === '')">
-        <div v-for="(poll, index) in publicPollData" :key="index">
-            <span v-if="'pollQuestion' in poll && 'genre' in poll && (fav.includes(poll.id) || resp.includes(poll.id) || cr.includes(poll.id))">
-            <h2 class="pollQuestion">
-                <span style="top: -5px" class="star" @click="toggleFavorite(poll.id, index)">{{ fav.includes(poll.id) ? '★' : '☆' }}</span>
-                <span style="top: -5px" class="delete" @click="deletePoll(poll.id, index)" v-if="cr.includes(poll.id)"> × </span>
-                {{ poll.pollQuestion }}
-            </h2>
-            </span>
-      <span v-if="'pollChoices' in poll && 'genre' in poll  && 'votes' in poll">
+  <div class="report">
+    <h1> This is your profile! </h1>
+    <h2> First Name: {{ fn }} </h2>
+    <h2> Last Name: {{ ln }}</h2>
+    <h2 id="email"></h2>
+    <h2 id="userId"></h2>
+  </div>
+  <div v-if="(filterSelection === 'Filter by' || filterSelection === '')">
+    <div v-for="(poll, index) in publicPollData" :key="index">
+      <span
+        v-if="'pollQuestion' in poll && 'genre' in poll && (fav.includes(poll.id) || resp.includes(poll.id) || cr.includes(poll.id))">
+        <h2 class="pollQuestion">
+          <span style="top: -5px" class="star" @click="toggleFavorite(poll.id, index)">{{ fav.includes(poll.id) ? '★' :
+            '☆' }}</span>
+          <span style="top: -5px" class="delete" @click="deletePoll(poll.id, index)" v-if="cr.includes(poll.id)"> ×
+          </span>
+          {{ poll.pollQuestion }}
+        </h2>
+      </span>
+      <span v-if="'pollChoices' in poll && 'genre' in poll && 'votes' in poll">
         <div v-for="(options, index) in poll.pollChoices">
-          <button class="pollButtons" v-if="options !== '' && (fav.includes(poll.id) || resp.includes(poll.id) || cr.includes(poll.id))">{{ options }}</button>
-          <p style="display: inline-block; margin-left: 10px;" v-if="options !== '' && Array.isArray(poll.votes) && (fav.includes(poll.id) || resp.includes(poll.id) || cr.includes(poll.id))">{{ (100*(poll.votes[index] / (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
+          <button class="pollButtons"
+            v-if="options !== '' && (fav.includes(poll.id) || resp.includes(poll.id) || cr.includes(poll.id))">{{ options
+            }}</button>
+          <p style="display: inline-block; margin-left: 10px;"
+            v-if="options !== '' && Array.isArray(poll.votes) && (fav.includes(poll.id) || resp.includes(poll.id) || cr.includes(poll.id))">
+            {{ (100 * (poll.votes[index] / (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2)
+            }}%
+          </p>
         </div>
-        
+
       </span>
     </div>
   </div>
   <div v-if="(filterSelection === 'Favorited Polls  ⭐')">
-        <div v-for="(poll, index) in publicPollData" :key="index">
-            <span v-if="'pollQuestion' in poll && fav.includes(poll.id)">
-                <h2>{{ cn(fav) }}</h2>
-            <h2 class="pollQuestion">
-                <span style="top: -5px" class="star" @click="toggleFavorite(poll.id, index)">{{ fav.includes(poll.id) ? '★' : '☆' }}</span>
-                <span style="top: -5px" class="delete" @click="deletePoll(poll.id, index)" v-if="cr.includes(poll.id)"> × </span>
-                    {{ poll.pollQuestion }}
-            </h2>
-            </span>
+    <div v-for="(poll, index) in publicPollData" :key="index">
+      <span v-if="'pollQuestion' in poll && fav.includes(poll.id)">
+        <h2>{{ cn(fav) }}</h2>
+        <h2 class="pollQuestion">
+          <span style="top: -5px" class="star" @click="toggleFavorite(poll.id, index)">{{ fav.includes(poll.id) ? '★' :
+            '☆' }}</span>
+          <span style="top: -5px" class="delete" @click="deletePoll(poll.id, index)" v-if="cr.includes(poll.id)"> ×
+          </span>
+          {{ poll.pollQuestion }}
+        </h2>
+      </span>
       <span v-if="'pollChoices' in poll && 'genre' in poll && 'votes' in poll">
         <div v-for="(options, index) in poll.pollChoices">
           <button class="pollButtons" v-if="options !== '' && fav.includes(poll.id)">{{ options }}</button>
-          <p style="display: inline-block; margin-left: 10px;" v-if="options !== '' && Array.isArray(poll.votes) && fav.includes(poll.id)">{{ (100*(poll.votes[index] / (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
+          <p style="display: inline-block; margin-left: 10px;"
+            v-if="options !== '' && Array.isArray(poll.votes) && fav.includes(poll.id)">{{ (100 * (poll.votes[index] /
+              (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
         </div>
       </span>
     </div>
   </div>
   <div v-if="(filterSelection === 'Polls Created')">
-        <div v-for="(poll, index) in publicPollData" :key="index">
-            <span v-if="'pollQuestion' in poll && cr.includes(poll.id)">
-            <h2 class="pollQuestion">
-                <span style="top: -5px" class="star" @click="toggleFavorite(poll.id, index)">{{ fav.includes(poll.id) ? '★' : '☆' }}</span>
-                <span style="top: -5px" class="delete" @click="deletePoll(poll.id, index)" v-if="cr.includes(poll.id)"> × </span>
-                    {{ poll.pollQuestion }}
-            </h2>
-            </span>
+    <div v-for="(poll, index) in publicPollData" :key="index">
+      <span v-if="'pollQuestion' in poll && cr.includes(poll.id)">
+        <h2 class="pollQuestion">
+          <span style="top: -5px" class="star" @click="toggleFavorite(poll.id, index)">{{ fav.includes(poll.id) ? '★' :
+            '☆' }}</span>
+          <span style="top: -5px" class="delete" @click="deletePoll(poll.id, index)" v-if="cr.includes(poll.id)"> ×
+          </span>
+          {{ poll.pollQuestion }}
+        </h2>
+      </span>
       <span v-if="'pollChoices' in poll && 'genre' in poll && 'votes' in poll">
         <div v-for="(options, index) in poll.pollChoices">
-          <button class="pollButtons" v-if="options !== ''  && cr.includes(poll.id)">{{ options }}</button>
-          <p style="display: inline-block; margin-left: 10px;" v-if="options !== '' && Array.isArray(poll.votes) && cr.includes(poll.id)">{{ (100*(poll.votes[index] / (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
+          <button class="pollButtons" v-if="options !== '' && cr.includes(poll.id)">{{ options }}</button>
+          <p style="display: inline-block; margin-left: 10px;"
+            v-if="options !== '' && Array.isArray(poll.votes) && cr.includes(poll.id)">{{ (100 * (poll.votes[index] /
+              (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
         </div>
-        
       </span>
     </div>
   </div>
   <div v-if="(filterSelection === 'Polls Responded To')">
-        <div v-for="(poll, index) in publicPollData" :key="index">
-            <span v-if="'pollQuestion' in poll && resp.includes(poll.id)">
-            <h2 class="pollQuestion">
-                <span style="top: -5px" class="star" @click="toggleFavorite(poll.id, index)">{{ fav.includes(poll.id) ? '★' : '☆' }}</span>
-                <span style="top: -5px" class="delete" @click="deletePoll(poll.id, index)" v-if="cr.includes(poll.id)"> × </span>
-                    {{ poll.pollQuestion }}
-            </h2>
-            </span>
+    <div v-for="(poll, index) in publicPollData" :key="index">
+      <span v-if="'pollQuestion' in poll && resp.includes(poll.id)">
+        <h2 class="pollQuestion">
+          <span style="top: -5px" class="star" @click="toggleFavorite(poll.id, index)">{{ fav.includes(poll.id) ? '★' :
+            '☆' }}</span>
+          <span style="top: -5px" class="delete" @click="deletePoll(poll.id, index)" v-if="cr.includes(poll.id)"> ×
+          </span>
+          {{ poll.pollQuestion }}
+        </h2>
+      </span>
       <span v-if="'pollChoices' in poll && 'genre' in poll && 'votes' in poll">
         <div v-for="(options, index) in poll.pollChoices">
-          <button class="pollButtons" v-if="options !== ''  && resp.includes(poll.id)">{{ options }}</button>
-          <p style="display: inline-block; margin-left: 10px;" v-if="options !== '' && Array.isArray(poll.votes)  && resp.includes(poll.id)">{{ (100*(poll.votes[index] / (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
+          <button class="pollButtons" v-if="options !== '' && resp.includes(poll.id)">{{ options }}</button>
+          <p style="display: inline-block; margin-left: 10px;"
+            v-if="options !== '' && Array.isArray(poll.votes) && resp.includes(poll.id)">{{ (100 * (poll.votes[index] /
+              (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
         </div>
       </span>
     </div>
   </div>
   <div v-if="(filterSelection === 'Statistics')">
-  <div class="chart">
-    <div class="bar-container">
-      <button class="bar fav-bar" v-bind:style="{ height: favPer + '%' }">{{ fav.length }}</button>
-      <div class="label">Favorites</div>
-    </div>
-    <div class="bar-container">
-      <button class="bar cr-bar" v-bind:style="{ height: crPer + '%' }">{{ cr.length }}</button>
-      <div class="label">Created</div>
-    </div>
-    <div class="bar-container">
-      <button class="bar resp-bar" v-bind:style="{ height: respPer + '%' }">{{ resp.length }}</button>
-      <div class="label">Responded</div>
+    <div class="chart">
+      <div class="bar-container">
+        <button class="bar fav-bar" v-bind:style="{ height: favPer + '%' }">{{ fav.length }}</button>
+        <div class="label">Favorites</div>
+      </div>
+      <div class="bar-container">
+        <button class="bar cr-bar" v-bind:style="{ height: crPer + '%' }">{{ cr.length }}</button>
+        <div class="label">Created</div>
+      </div>
+      <div class="bar-container">
+        <button class="bar resp-bar" v-bind:style="{ height: respPer + '%' }">{{ resp.length }}</button>
+        <div class="label">Responded</div>
+      </div>
     </div>
   </div>
-</div>
-
+  <div>
+    <button @click="scrollToTop" class="back-to-top">Back to top</button>
+  </div>
 </template>  
 
 <style scoped>
 /* @import url('../style.css'); */
 #grid {
-   display: inline-grid;
-   grid-template-columns: repeat(5, 1fr);
-   grid-template-rows: repeat(6, 1fr);
-   grid-gap: 8px;
- }
+  display: inline-grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  grid-gap: 8px;
+}
 
- .cell {
-   text-transform: uppercase;
-   text-align: center;
-   width: 100px;
-   height: 100px;
-   align-self: center;
-   font-size: 100px;
-   border: 5px solid black;
-   color: black;
-   background-color: white;
- }
+.back-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+}
 
- .chart {
+.cell {
+  text-transform: uppercase;
+  text-align: center;
+  width: 100px;
+  height: 100px;
+  align-self: center;
+  font-size: 100px;
+  border: 5px solid black;
+  color: black;
+  background-color: white;
+}
+
+.chart {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  height: 400px; /* adjust as needed */
+  height: 400px;
+  /* adjust as needed */
   margin: 20px;
 }
 
@@ -353,7 +358,6 @@ function cn(val: any) {
   margin: 0 75px;
   font-weight: bold;
 }
-
 
 .bar {
   width: 300px;
@@ -404,8 +408,7 @@ function cn(val: any) {
   box-shadow: none;
 }
 
-
- .question {
+.question {
   border-radius: 8px;
   border: 2px solid transparent;
   border-color: #3498db;
@@ -443,7 +446,6 @@ function cn(val: any) {
   color: red;
 }
 
-
 .question:hover,
 .question:focus {
   border-color: #1abc9c;
@@ -459,7 +461,6 @@ function cn(val: any) {
   outline: none;
   transition: border-color 0.2s ease-in-out;
   width: 50%;
-  /* Set desired width here */
 }
 
 .answer:hover,
@@ -490,19 +491,20 @@ function cn(val: any) {
   justify-content: center;
   margin-top: 5%;
   color: rgb(0, 0, 0);
-  position: relative; /* make the position of the container element relative */
+  position: relative;
+  /* make the position of the container element relative */
 }
 
- .report {
-   background-color: darkseagreen;
-   padding: 20px;
-   font-size: 20px;
-   border: 5px dashed black;
-   color: black;
- }
+.report {
+  background-color: darkseagreen;
+  padding: 20px;
+  font-size: 20px;
+  border: 5px dashed black;
+  color: black;
+}
 
 
- select {
+select {
   border-radius: 8px;
   border: 2px solid transparent;
   border-color: #3498db;
@@ -516,5 +518,4 @@ function cn(val: any) {
   width: 25%;
   text-align: center;
 }
-
 </style>
