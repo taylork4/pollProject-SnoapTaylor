@@ -342,6 +342,9 @@ async function toggleFavorite(pollID: string, index: number) {
     </select>
   </div>
   <br>
+  <span v-if="!isLoggedIn">
+    <h1 style="line-height: 100%;"> Sign up to create and answer polls! </h1>
+  </span>
   <span v-if="isLoggedIn">
     <div class="header">
       <span v-if="createPoll == 1">
