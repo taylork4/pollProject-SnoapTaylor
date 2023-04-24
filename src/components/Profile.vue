@@ -139,11 +139,15 @@ console.log(`New value ${newUserUid}`)
 let fn = ref('');
 let ln = ref('');
 let fav = ref<string[]>([]);
+let cr = ref<string[]>([]);
+let resp = ref<string[]>([]);
 // let lastName = ref("");
 function dataAnalysis(data: any) {
     fn.value = data.firstName; // Read 'firstName' field
     ln.value = data.lastName;
     fav.value = data.favorited;
+    cr.value = data.created;
+    resp.value = data.resp;
     // console.log("Favorites: ", fav.value.slice());
     
     
@@ -211,7 +215,7 @@ function cn(val: any) {
             <span v-if="'pollQuestion' in poll && 'genre' in poll">
             <h2 class="pollQuestion">
                 <span class="star" @click="toggleFavorite(poll.id, index)">{{ fav.includes(poll.id) ? '★' : '☆' }}</span>
-                <span class="delete" @click="deletePoll(poll.id, index)"> × </span>
+                <span class="delete" @click="deletePoll(poll.id, index)" v-if="cr.includes(poll.id)"> × </span>
                 {{ poll.pollQuestion }}
             </h2>
             </span>
@@ -228,7 +232,7 @@ function cn(val: any) {
             <span v-if="'pollQuestion' in poll">
             <h2 class="pollQuestion">
                 <span class="star" @click="toggleFavorite(poll.id, index)">{{ fav.includes(poll.id) ? '★' : '☆' }}</span>
-                <span class="delete" @click="deletePoll(poll.id, index)"> × </span>
+                <span class="delete" @click="deletePoll(poll.id, index)" v-if="cr.includes(poll.id)"> × </span>
                     {{ poll.pollQuestion }}
             </h2>
             </span>
@@ -246,13 +250,47 @@ function cn(val: any) {
                 <h2>{{ cn(fav) }}</h2>
             <h2 class="pollQuestion">
                 <span class="star" @click="toggleFavorite(poll.id, index)">{{ fav.includes(poll.id) ? '★' : '☆' }}</span>
-                <span class="delete" @click="deletePoll(poll.id, index)"> × </span>
+                <span class="delete" @click="deletePoll(poll.id, index)" v-if="cr.includes(poll.id)"> × </span>
                     {{ poll.pollQuestion }}
             </h2>
             </span>
       <span v-if="'pollChoices' in poll && 'genre' in poll">
         <div v-for="(options, index) in poll.pollChoices">
           <button class="pollButtons" v-if="options !== '' && fav.includes(poll.id)">{{ options }}</button>
+        </div>
+        <br>
+      </span>
+    </div>
+  </div>
+  <div v-if="(filterSelection === 'Polls Created')">
+        <div v-for="(poll, index) in publicPollData" :key="index">
+            <span v-if="'pollQuestion' in poll && cr.includes(poll.id)">
+            <h2 class="pollQuestion">
+                <span class="star" @click="toggleFavorite(poll.id, index)">★</span>
+                <span class="delete" @click="deletePoll(poll.id, index)" v-if="cr.includes(poll.id)"> × </span>
+                    {{ poll.pollQuestion }}
+            </h2>
+            </span>
+      <span v-if="'pollChoices' in poll && 'genre' in poll">
+        <div v-for="(options, index) in poll.pollChoices">
+          <button class="pollButtons" v-if="options !== ''  && cr.includes(poll.id)">{{ options }}</button>
+        </div>
+        <br>
+      </span>
+    </div>
+  </div>
+  <div v-if="(filterSelection === 'Polls Responded To')">
+        <div v-for="(poll, index) in publicPollData" :key="index">
+            <span v-if="'pollQuestion' in poll && resp.includes(poll.id)">
+            <h2 class="pollQuestion">
+                <span class="star" @click="toggleFavorite(poll.id, index)">★</span>
+                <span class="delete" @click="deletePoll(poll.id, index)" v-if="cr.includes(poll.id)"> × </span>
+                    {{ poll.pollQuestion }}
+            </h2>
+            </span>
+      <span v-if="'pollChoices' in poll && 'genre' in poll">
+        <div v-for="(options, index) in poll.pollChoices">
+          <button class="pollButtons" v-if="options !== ''  && resp.includes(poll.id)">{{ options }}</button>
         </div>
         <br>
       </span>
@@ -308,7 +346,7 @@ function cn(val: any) {
   position: absolute;
   top: 0;
   right: 18px;
-  color: black;
+  color: gold;
   font-size: 24px;
   cursor: pointer;
   padding: 1%;
@@ -318,11 +356,6 @@ function cn(val: any) {
   color: red;
 }
 
-.star.favorite {
-  color: gold;
-  cursor: pointer;
-  padding: 1%;
-}
 
 .question:hover,
 .question:focus {
