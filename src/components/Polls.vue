@@ -395,6 +395,7 @@ async function toggleFavorite(pollID: string, index: number) {
     </div>
     <div v-if="createPoll == 1">
       <h1 style="line-height: 100%;"> Click the + button to create a poll! </h1>
+      <h2>Refresh to see updates!</h2>
     </div>
   </span>
   <div v-if="createPoll == 1 && (filterGenre === 'Filter by Genre' || filterGenre === '')">
