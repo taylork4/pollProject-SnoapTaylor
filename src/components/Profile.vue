@@ -249,8 +249,8 @@ function cn(val: any) {
             <span v-if="'pollQuestion' in poll && fav.includes(poll.id)">
                 <h2>{{ cn(fav) }}</h2>
             <h2 class="pollQuestion">
-                <span class="star" @click="toggleFavorite(poll.id, index)">{{ fav.includes(poll.id) ? '★' : '☆' }}</span>
-                <span class="delete" @click="deletePoll(poll.id, index)" v-if="cr.includes(poll.id)"> × </span>
+                <span style="top: -5px" class="star" @click="toggleFavorite(poll.id, index)">{{ fav.includes(poll.id) ? '★' : '☆' }}</span>
+                <span style="top: -5px" class="delete" @click="deletePoll(poll.id, index)" v-if="cr.includes(poll.id)"> × </span>
                     {{ poll.pollQuestion }}
             </h2>
             </span>
@@ -282,8 +282,8 @@ function cn(val: any) {
         <div v-for="(poll, index) in publicPollData" :key="index">
             <span v-if="'pollQuestion' in poll && resp.includes(poll.id)">
             <h2 class="pollQuestion">
-                <span class="star" @click="toggleFavorite(poll.id, index)">★</span>
-                <span class="delete" @click="deletePoll(poll.id, index)" v-if="cr.includes(poll.id)"> × </span>
+                <span style="top: -5px" class="star" @click="toggleFavorite(poll.id, index)">★</span>
+                <span style="top: -5px" class="delete" @click="deletePoll(poll.id, index)" v-if="cr.includes(poll.id)"> × </span>
                     {{ poll.pollQuestion }}
             </h2>
             </span>
