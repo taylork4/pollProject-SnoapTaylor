@@ -297,12 +297,12 @@ function cn(val: any) {
     </div>
   </div>
   <div v-if="(filterSelection === 'Statistics')">'
-    <div class="chart">
-        <button class="bar" v-bind:style="{ height: favPer + '%' }">{{ fav.length }}</button>
-        <button class="bar" v-bind:style="{ height: crPer + '%' }">{{ cr.length }}</button>
-        <button class="bar" v-bind:style="{ height: respPer + '%' }">{{ resp.length }}</button>
-    </div>
+  <div class="chart">
+    <button class="bar fav-bar" v-bind:style="{ height: favPer + '%' }">{{ fav.length }}</button>
+    <button class="bar cr-bar" v-bind:style="{ height: crPer + '%' }">{{ cr.length }}</button>
+    <button class="bar resp-bar" v-bind:style="{ height: respPer + '%' }">{{ resp.length }}</button>
   </div>
+</div>
 </template>  
 
 <style scoped>
@@ -327,25 +327,55 @@ function cn(val: any) {
  }
 
  .chart {
-  display: flex;
-  align-items: flex-end;
-  height: 300px;
-  margin: 20px;
+display: flex;
+align-items: flex-end;
+justify-content: center;
+height: 300px;
+margin: 20px;
 }
 
 .bar {
-  width: 50px;
-  background-color: #4CAF50;
-  border-radius: 5px;
-  margin: 0 10px;
+width: 100px;
+border-radius: 5px;
+margin: 0 30px;
+color: white;
+font-weight: bold;
+font-size: 16px;
+text-transform: uppercase;
+transition: all 0.3s ease-in-out;
+color: black;
+}
+
+.fav-bar {
+background-color: #FFC857;
+}
+
+.cr-bar {
+background-color: #E9724C;
+}
+
+.resp-bar {
+background-color: #C5283D;
 }
 
 .chart::after {
-  content: "";
-  display: block;
-  height: 5px;
-  background-color: #333;
-  margin-top: 10px;
+content: "";
+display: block;
+height: 5px;
+background-color: #333;
+margin-top: 10px;
+}
+
+/* Hover effect */
+.bar:hover {
+transform: translateY(-5px);
+box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Active effect */
+.bar:active {
+transform: translateY(0);
+box-shadow: none;
 }
 
  .question {
