@@ -563,4 +563,10 @@ select {
   position: relative;
   /* make the position of the container element relative */
 }
+.back-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+}
+
 </style>
