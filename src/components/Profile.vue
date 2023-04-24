@@ -5,9 +5,8 @@
 // Import the functions you need from the SDKs you need
 import { User } from "firebase/auth";
 import { ref, watch } from "vue"
-import { RouteLocationNormalized } from 'vue-router';
 import 'firebase/firestore';
-import { collection, updateDoc, doc, getDoc, getDocs, CollectionReference, query, collectionGroup, QuerySnapshot, where, QueryDocumentSnapshot, deleteDoc } from 'firebase/firestore';
+import { collection, updateDoc, doc, getDoc, getDocs, deleteDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase/init.js'
 
 const userUid = ref('');
@@ -17,7 +16,6 @@ let newUserUid = "";
 let newUserEmail = "";
 const filterOptions = ["Favorited Polls  ⭐", "Polls Responded To", "Polls Created", "Statistics"]
 let filterSelection = ref("");
-let numPolls: number = 0;
 
 async function fetchData(em: string) {
   const docRef = doc(db, "profile", em);
@@ -50,18 +48,10 @@ getDocs(pollsPublicRef).then((pollsSnapshot) => {
   return Promise.all(pollsPromises);
 })
   .then((pData) => {
-    console.log(pData);
 
     for (let i = 0; i < pData.length; i++) {
       publicPollData.value[i] = pData[i]
     }
-
-    // Access data from "allPolls" collection directly
-    if ('date' in pData[0]) {
-      console.log("PUBLIC DATE:", pData[0].date); // Code to get 'date' from document
-    }
-    numPolls = pData.length; // Code to get number of documents in "allPolls" subcollection
-    console.log(numPolls); // Code to get 'date' from document
   })
   .catch((err) => {
     console.log(err.message);
@@ -73,7 +63,6 @@ auth.onAuthStateChanged(function (user: User | null) {
   if (user) {
     isLoggedIn.value = true // if we have a user
     userUid.value = user.uid; // store the user UID in the ref
-    console.log(`User UID: ${userUid.value}`);
   } else {
     isLoggedIn.value = false // if we do not
     userUid.value = ''; // clear the user UID ref
@@ -82,19 +71,16 @@ auth.onAuthStateChanged(function (user: User | null) {
 
 async function logUserUid() {
   await new Promise<void>((resolve) => {
-    watch(userEmail, (newValue, oldValue) => {
-      console.log(`userEmail changed from ${oldValue} to ${newValue}`);
+    watch(userEmail, (newValue) => {
       newUserEmail = newValue;
       resolve();
     });
-    watch(userUid, (newValue, oldValue) => {
-      console.log(`userEmail changed from ${oldValue} to ${newValue}`);
+    watch(userUid, (newValue) => {
       newUserUid = newValue;
       resolve();
     });
   });
 
-  console.log(`New userEmail value: ${newUserEmail}`);
   fetchData(newUserEmail);
 }
 
@@ -121,9 +107,8 @@ let resp = ref<string[]>([]);
 let favPer = ref(0);
 let crPer = ref(0);
 let respPer = ref(0);
-// let lastName = ref("");
 function dataAnalysis(data: any) {
-  fn.value = data.firstName; // Read 'firstName' field
+  fn.value = data.firstName;
   ln.value = data.lastName;
   fav.value = data.favorited;
   cr.value = data.created;
@@ -314,7 +299,6 @@ function scrollToTop() {
 </template>  
 
 <style scoped>
-/* @import url('../style.css'); */
 #grid {
   display: inline-grid;
   grid-template-columns: repeat(5, 1fr);
@@ -345,7 +329,6 @@ function scrollToTop() {
   align-items: flex-end;
   justify-content: center;
   height: 400px;
-  /* adjust as needed */
   margin: 20px;
 }
 
@@ -396,13 +379,11 @@ function scrollToTop() {
   text-align: center;
 }
 
-/* Hover effect */
 .bar:hover {
   transform: translateY(-5px);
   box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
 }
 
-/* Active effect */
 .bar:active {
   transform: translateY(0);
   box-shadow: none;
@@ -492,7 +473,6 @@ function scrollToTop() {
   margin-top: 5%;
   color: rgb(0, 0, 0);
   position: relative;
-  /* make the position of the container element relative */
 }
 
 .report {
@@ -513,7 +493,6 @@ select {
   color: #a5d7f8;
   outline: none;
   margin-bottom: 40px;
-  /* background-color: rgb(189, 189, 189); */
   transition: border-color 0.2s ease-in-out;
   width: 25%;
   text-align: center;

@@ -12,11 +12,11 @@ const router = useRouter();
 const email = ref('');
 const password = ref('');
 const provider = new GoogleAuthProvider();
+
 /* Allows user to log in with Google */
 const loginWGoog = () => {
   signInWithPopup(auth, provider)
   .then((cred: UserCredential) => {
-          // document.cookie = `userEmail=${cred.user?.email}; expires=Thu, 01 Jan 2099 00:00:00 UTC; path=/;`;
             console.log('Successfully logged in!');
             router.push({
               name: 'Polls',
@@ -32,7 +32,6 @@ const loginWGoog = () => {
   const login = () => {
         signInWithEmailAndPassword(auth, email.value, password.value)
         .then((cred: UserCredential) => {
-          // document.cookie = `userEmail=${cred.user?.email}; expires=Thu, 01 Jan 2099 00:00:00 UTC; path=/;`;
             console.log('Successfully logged in!');
             router.push({
               name: 'Polls',
@@ -50,7 +49,7 @@ const loginWGoog = () => {
   <h1>Login to Your Account</h1>
   <p><input type="text" placeholder="Email" v-model="email" /></p>
   <p><input type="password" placeholder="Password" v-model="password" /></p>
-  <p><button  @click="login">Login</button></p> <!--:disabled = "signedUp" -->
+  <p><button  @click="login">Login</button></p>
   <p><button  @click="loginWGoog"> Login with Google </button></p>
   <router-view />
 </template>

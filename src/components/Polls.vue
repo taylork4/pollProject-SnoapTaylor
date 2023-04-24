@@ -452,7 +452,6 @@ async function toggleFavorite(pollID: string, index: number) {
 
 
 <style scoped>
-/* @import url('../style.css'); */
 #grid {
   display: inline-grid;
   grid-template-columns: repeat(5, 1fr);
@@ -505,7 +504,6 @@ select {
   font-size: 24px;
   color: #a5d7f8;
   outline: none;
-  /* background-color: rgb(189, 189, 189); */
   transition: border-color 0.2s ease-in-out;
   width: 25%;
   text-align: center;
@@ -522,7 +520,6 @@ select {
   outline: none;
   transition: border-color 0.2s ease-in-out;
   width: 50%;
-  /* Set desired width here */
 }
 
 .answer:hover,
@@ -581,7 +578,6 @@ select {
   margin-top: 5%;
   color: rgb(0, 0, 0);
   position: relative;
-  /* make the position of the container element relative */
 }
 .back-to-top {
   position: fixed;

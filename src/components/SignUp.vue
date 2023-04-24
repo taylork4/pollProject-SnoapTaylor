@@ -1,14 +1,12 @@
 <script setup lang = "ts">
-import { ref, defineProps, computed, withDefaults, Ref, watch } from "vue";
-import { useRouter, useRoute, RouteLocationNormalized } from 'vue-router';
-import {User, createUserWithEmailAndPassword, UserCredential, sendEmailVerification } from "firebase/auth";
-import {collection, addDoc, DocumentReference, DocumentSnapshot, setDoc, doc, getDoc, getDocs, CollectionReference, query, collectionGroup, QuerySnapshot, where, QueryDocumentSnapshot } from 'firebase/firestore';
+import { ref } from "vue";
+import { useRouter } from 'vue-router';
+import {createUserWithEmailAndPassword, UserCredential, sendEmailVerification } from "firebase/auth";
+import {DocumentReference, setDoc, doc } from 'firebase/firestore';
 import { db, auth } from '../firebase/init.js'
 const router = useRouter();
-// Import the functions you need from the SDKs you need
 
 /* Firebase passing stuff */
-// const wordsColl = doc(db, 'wordleWords/words')
     let prData: {
         firstName: string;
         lastName: string;
@@ -25,6 +23,7 @@ const router = useRouter();
 
     const email = ref('');
     const password = ref('');
+    
     /* Updates existing document */
     async function setFire(coll: DocumentReference, data: any) {
         try {
@@ -35,8 +34,6 @@ const router = useRouter();
             console.log(`I got an error! ${error}`);
         }
     }
-
-    // const profRef = collection(db, "profile");
 
 
   /* Allows user to sign up with email and password */

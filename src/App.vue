@@ -15,7 +15,6 @@
 
 const route = useRoute() as CurrentRoute;
 const email = route.query.email;
-let currentUser: User | null = null;
 const userUid = ref('');
 const userEmail = ref('');
 let usId = "";
@@ -27,8 +26,7 @@ const isLoggedIn = ref(true)
   auth.onAuthStateChanged(function(user: User | null) {
       if (user) {
         isLoggedIn.value = true // if we have a user
-        userUid.value = user.uid; // store the user UID in the ref
-        console.log(`User UID: ${userUid.value}`);        
+        userUid.value = user.uid; // store the user UID in the ref       
       } else {
         isLoggedIn.value = false // if we do not
         userUid.value = ''; // clear the user UID ref
@@ -38,14 +36,11 @@ const isLoggedIn = ref(true)
   
   async function logUserUid() {
   await new Promise<void>((resolve) => {
-    watch(userEmail, (newValue, oldValue) => {
-      console.log(`userEmail changed from ${oldValue} to ${newValue}`);
+    watch(userEmail, (newValue) => {
       newUserEmail = newValue;
       resolve();
     });
   });
-
-  console.log(`New userEmail value: ${newUserEmail}`);
 }
 
 
@@ -63,7 +58,6 @@ function setUserId(user: User | null) {
 
 auth.onAuthStateChanged(setUserId);
 logUserUid();
-console.log(`New value ${newUserUid}`)
 
 /* Allows user to sign out and sends them back to the home screen */
 const signOut = () => {
@@ -131,11 +125,6 @@ const signOut = () => {
 .email {
   margin-left: auto;
 }
-/* .buttons {
-   display: flex;
-   align-items: center;
-   justify-content: center;
- } */
 
  table {
     table-layout: auto; 
