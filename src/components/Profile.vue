@@ -147,7 +147,7 @@ function dataAnalysis(data: any) {
     ln.value = data.lastName;
     fav.value = data.favorited;
     cr.value = data.created;
-    resp.value = data.resp;
+    resp.value = data.responded;
     // console.log("Favorites: ", fav.value.slice());
     
     
@@ -212,7 +212,7 @@ function cn(val: any) {
     
     <div v-if="(filterSelection === 'Filter by' || filterSelection === '')">
         <div v-for="(poll, index) in publicPollData" :key="index">
-            <span v-if="'pollQuestion' in poll && 'genre' in poll">
+            <span v-if="'pollQuestion' in poll && 'genre' in poll && (fav.includes(poll.id) || resp.includes(poll.id) || cr.includes(poll.id))">
             <h2 class="pollQuestion">
                 <span style="top: -5px" class="star" @click="toggleFavorite(poll.id, index)">{{ fav.includes(poll.id) ? '★' : '☆' }}</span>
                 <span style="top: -5px" class="delete" @click="deletePoll(poll.id, index)" v-if="cr.includes(poll.id)"> × </span>
@@ -221,8 +221,8 @@ function cn(val: any) {
             </span>
       <span v-if="'pollChoices' in poll && 'genre' in poll  && 'votes' in poll">
         <div v-for="(options, index) in poll.pollChoices">
-          <button class="pollButtons" v-if="options !== ''">{{ options }}</button>
-          <p style="display: inline-block; margin-left: 10px;" v-if="options !== '' && Array.isArray(poll.votes)">{{ (100*(poll.votes[index] / (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
+          <button class="pollButtons" v-if="options !== '' && (fav.includes(poll.id) || resp.includes(poll.id) || cr.includes(poll.id))">{{ options }}</button>
+          <p style="display: inline-block; margin-left: 10px;" v-if="options !== '' && Array.isArray(poll.votes) && (fav.includes(poll.id) || resp.includes(poll.id) || cr.includes(poll.id))">{{ (100*(poll.votes[index] / (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
         </div>
         
       </span>
