@@ -480,7 +480,11 @@ async function toggleFavorite(pollID: string, index: number) {
   font-size: 24px;
   cursor: pointer;
   padding: 1%;
+  -webkit-text-stroke: 1px black;
+  -moz-text-stroke: 1px black;
 }
+
+
 
 .star.favorite {
   color: gold;

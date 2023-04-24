@@ -258,7 +258,6 @@ function cn(val: any) {
         <div v-for="(options, index) in poll.pollChoices">
           <button class="pollButtons" v-if="options !== '' && fav.includes(poll.id)">{{ options }}</button>
         </div>
-        
       </span>
     </div>
   </div>
@@ -350,6 +349,8 @@ function cn(val: any) {
   font-size: 24px;
   cursor: pointer;
   padding: 1%;
+  -webkit-text-stroke: 1px black;
+  -moz-text-stroke: 1px black;
 }
 
 .delete {
