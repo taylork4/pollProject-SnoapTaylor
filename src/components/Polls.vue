@@ -343,7 +343,7 @@ async function toggleFavorite(pollID: string, index: number) {
   </div>
   <br>
   <span v-if="!isLoggedIn">
-    <h1 style="line-height: 100%;"> Sign up to create and answer polls! </h1>
+    <h1 style="line-height: 100%;"> Sign Up or Login to create and answer polls! </h1>
   </span>
   <span v-if="isLoggedIn">
     <div class="header">
