@@ -79,6 +79,7 @@ auth.onAuthStateChanged(function (user: User | null) {
     userUid.value = ''; // clear the user UID ref
   }
 })
+
 function dataAnalysis(data: any) {
     fav.value = data.favorited;
 }
@@ -416,7 +417,7 @@ async function toggleFavorite(pollID: string, index: number) {
     <div v-for="(poll, index) in publicPollData" :key="index">
       <span v-if="'pollQuestion' in poll">
         <h2 class="pollQuestion">
-          <span class="star" @click="toggleFavorite(poll.id, index)">{{ fav.includes(poll.id) ? '★' : '☆' }}</span>
+          <span style="top: -5px; right: 5px;" class="star" @click="toggleFavorite(poll.id, index)">{{ fav.includes(poll.id) ? '★' : '☆' }}</span>
           {{ poll.pollQuestion }}
         </h2>
       </span>
