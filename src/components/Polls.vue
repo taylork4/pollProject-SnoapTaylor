@@ -64,6 +64,8 @@ let option3 = ref(1);
 let option4 = ref(1);
 let numPolls: number = 0;
 let pollCount: number = 1;
+let fav = ref<string[]>([]);
+
 
 const isLoggedIn = ref(true)
 // runs after firebase is initialized
@@ -77,6 +79,25 @@ auth.onAuthStateChanged(function (user: User | null) {
     userUid.value = ''; // clear the user UID ref
   }
 })
+function dataAnalysis(data: any) {
+    fav.value = data.favorited;
+}
+
+async function fetchData(em: string) {
+  const docRef = doc(db, "profile", em);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    const data = docSnap.data();
+    if (data) {
+        dataAnalysis(data);
+    } else {
+      console.log("No data found in document!");
+    }
+  } else {
+    console.log("No such document!");
+  }
+}
 
 async function logUserUid() {
   await new Promise<void>((resolve) => {
@@ -93,6 +114,7 @@ async function logUserUid() {
   });
 
   //   console.log(`New userUid value: ${newUserUid}`);
+  fetchData(newUserEmail);
 }
 
 function setUserId(user: User | null) {
@@ -394,7 +416,7 @@ async function toggleFavorite(pollID: string, index: number) {
     <div v-for="(poll, index) in publicPollData" :key="index">
       <span v-if="'pollQuestion' in poll">
         <h2 class="pollQuestion">
-          <span class="star" @click="toggleFavorite(poll.id, index)">&#9734;</span>
+          <span class="star" @click="toggleFavorite(poll.id, index)">{{ fav.includes(poll.id) ? '★' : '☆' }}</span>
           {{ poll.pollQuestion }}
         </h2>
       </span>
@@ -410,7 +432,7 @@ async function toggleFavorite(pollID: string, index: number) {
     <div v-for="(poll, index) in publicPollData" :key="index">
       <span v-if="'pollQuestion' in poll && 'genre' in poll">
         <h2 class="pollQuestion" v-if="poll.genre === filterGenre">
-          <span class="star" @click="toggleFavorite(poll.id, index)">&#9734;</span>
+          <span class="star" @click="toggleFavorite(poll.id, index)">{{ fav.includes(poll.id) ? '★' : '☆' }}</span>
           {{ poll.pollQuestion }}
         </h2>
       </span>
@@ -452,8 +474,8 @@ async function toggleFavorite(pollID: string, index: number) {
 .star {
   position: absolute;
   top: 0;
-  right: 0;
-  color: black;
+  right: 18px;
+  color: gold;
   font-size: 24px;
   cursor: pointer;
   padding: 1%;
