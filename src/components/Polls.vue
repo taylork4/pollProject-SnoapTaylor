@@ -331,17 +331,15 @@ async function toggleFavorite(pollID: string, index: number) {
   }
 }
 
-
 </script>
 
 <template>
   <div v-if="createPoll == 1">
-    <select v-model="filterGenre" id="genre">
+    <select style="margin-bottom: 20px;" v-model="filterGenre" id="genre">
       <option value="">Filter by Genre</option>
       <option v-for="genre in genres" :value="genre">{{ genre }}</option>
     </select>
   </div>
-  <br>
   <span v-if="!isLoggedIn">
     <h1 style="line-height: 100%;"> Sign Up or Login to create and answer polls! </h1>
   </span>
@@ -370,11 +368,9 @@ async function toggleFavorite(pollID: string, index: number) {
               class="answer" />
             <button @click="op3"> - </button>
           </div>
-          <br>
         </span>
         <span v-if="option4 == 1 && option3 == 2">
-          <button @click="op4"> + </button>
-          <br>
+          <button @click="op4"> + </button>          
         </span>
         <span v-if="option4 == 2">
           <div>
@@ -382,11 +378,7 @@ async function toggleFavorite(pollID: string, index: number) {
               class="answer" />
             <button @click="op4"> - </button>
           </div>
-        </span>
-        <br>
-        <br>
-        <br>
-        <br>
+        </span> 
         <div class="header"
           v-if="!(pollC[0] === '' || pollC[1] === '' || pollQ === '' || selectedGenre === 'Select a genre' || selectedGenre === '')">
           <button @click="post"> Post </button>
@@ -411,7 +403,6 @@ async function toggleFavorite(pollID: string, index: number) {
           <button @click="optionsClick(poll.id, index)" class="pollButtons" v-if="options !== ''">{{ options }}</button>
           <p style="display: inline-block; margin-left: 10px;" v-if="options !== '' && Array.isArray(poll.votes)">{{ (100*(poll.votes[index] / (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
         </div>
-        <br>
       </span>
     </div>
   </div>
@@ -428,7 +419,6 @@ async function toggleFavorite(pollID: string, index: number) {
           <button @click="optionsClick(poll.id, index)" class="pollButtons" v-if="options !== ''">{{ options }}</button>
           <p style="display: inline-block; margin-left: 10px;" v-if="options !== '' && Array.isArray(poll.votes)">{{ (100*(poll.votes[index] / (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
         </div>
-        <br>
       </span>
     </div>
   </div>

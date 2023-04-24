@@ -200,7 +200,7 @@ function cn(val: any) {
       <option v-for="ops in filterOptions" :value="ops">{{ ops }}</option>
     </select>
   </span>
-    <br>
+    
     <div class="report">
         <h1> This is your profile! </h1>
         <h2> First Name: {{ fn }} </h2>
@@ -208,8 +208,8 @@ function cn(val: any) {
         <h2 id="email"></h2>
         <h2 id="userId"></h2>
     </div>
-    <br>
-    <br>
+    
+    
     <div v-if="(filterSelection === 'Filter by' || filterSelection === '')">
         <div v-for="(poll, index) in publicPollData" :key="index">
             <span v-if="'pollQuestion' in poll && 'genre' in poll">
@@ -223,7 +223,7 @@ function cn(val: any) {
         <div v-for="(options, index) in poll.pollChoices">
           <button class="pollButtons" v-if="options !== ''">{{ options }}</button>
         </div>
-        <br>
+        
       </span>
     </div>
   </div>
@@ -240,7 +240,7 @@ function cn(val: any) {
         <div v-for="(options, index) in poll.pollChoices">
           <button class="pollButtons" v-if="options !== ''">{{ options }}</button>
         </div>
-        <br>
+        
       </span>
     </div>
   </div>
@@ -258,7 +258,7 @@ function cn(val: any) {
         <div v-for="(options, index) in poll.pollChoices">
           <button class="pollButtons" v-if="options !== '' && fav.includes(poll.id)">{{ options }}</button>
         </div>
-        <br>
+        
       </span>
     </div>
   </div>
@@ -275,7 +275,7 @@ function cn(val: any) {
         <div v-for="(options, index) in poll.pollChoices">
           <button class="pollButtons" v-if="options !== ''  && cr.includes(poll.id)">{{ options }}</button>
         </div>
-        <br>
+        
       </span>
     </div>
   </div>
@@ -292,7 +292,7 @@ function cn(val: any) {
         <div v-for="(options, index) in poll.pollChoices">
           <button class="pollButtons" v-if="options !== ''  && resp.includes(poll.id)">{{ options }}</button>
         </div>
-        <br>
+        
       </span>
     </div>
   </div>
