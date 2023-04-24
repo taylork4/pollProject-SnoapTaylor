@@ -219,26 +219,10 @@ function cn(val: any) {
                 {{ poll.pollQuestion }}
             </h2>
             </span>
-      <span v-if="'pollChoices' in poll && 'genre' in poll">
+      <span v-if="'pollChoices' in poll && 'genre' in poll  && 'votes' in poll">
         <div v-for="(options, index) in poll.pollChoices">
           <button class="pollButtons" v-if="options !== ''">{{ options }}</button>
-        </div>
-        
-      </span>
-    </div>
-  </div>
-  <div v-if="(filterSelection === 'Statistics')">
-        <div v-for="(poll, index) in publicPollData" :key="index">
-            <span v-if="'pollQuestion' in poll">
-            <h2 class="pollQuestion">
-                <span style="top: -5px" class="star" @click="toggleFavorite(poll.id, index)">{{ fav.includes(poll.id) ? '★' : '☆' }}</span>
-                <span style="top: -5px" class="delete" @click="deletePoll(poll.id, index)" v-if="cr.includes(poll.id)"> × </span>
-                    {{ poll.pollQuestion }}
-            </h2>
-            </span>
-      <span v-if="'pollChoices' in poll && 'genre' in poll">
-        <div v-for="(options, index) in poll.pollChoices">
-          <button class="pollButtons" v-if="options !== ''">{{ options }}</button>
+          <p style="display: inline-block; margin-left: 10px;" v-if="options !== '' && Array.isArray(poll.votes)">{{ (100*(poll.votes[index] / (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
         </div>
         
       </span>
@@ -254,9 +238,10 @@ function cn(val: any) {
                     {{ poll.pollQuestion }}
             </h2>
             </span>
-      <span v-if="'pollChoices' in poll && 'genre' in poll">
+      <span v-if="'pollChoices' in poll && 'genre' in poll && 'votes' in poll">
         <div v-for="(options, index) in poll.pollChoices">
           <button class="pollButtons" v-if="options !== '' && fav.includes(poll.id)">{{ options }}</button>
+          <p style="display: inline-block; margin-left: 10px;" v-if="options !== '' && Array.isArray(poll.votes) && fav.includes(poll.id)">{{ (100*(poll.votes[index] / (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
         </div>
       </span>
     </div>
@@ -265,14 +250,15 @@ function cn(val: any) {
         <div v-for="(poll, index) in publicPollData" :key="index">
             <span v-if="'pollQuestion' in poll && cr.includes(poll.id)">
             <h2 class="pollQuestion">
-                <span style="top: -5px" class="star" @click="toggleFavorite(poll.id, index)">★</span>
+                <span style="top: -5px" class="star" @click="toggleFavorite(poll.id, index)">{{ fav.includes(poll.id) ? '★' : '☆' }}</span>
                 <span style="top: -5px" class="delete" @click="deletePoll(poll.id, index)" v-if="cr.includes(poll.id)"> × </span>
                     {{ poll.pollQuestion }}
             </h2>
             </span>
-      <span v-if="'pollChoices' in poll && 'genre' in poll">
+      <span v-if="'pollChoices' in poll && 'genre' in poll && 'votes' in poll">
         <div v-for="(options, index) in poll.pollChoices">
           <button class="pollButtons" v-if="options !== ''  && cr.includes(poll.id)">{{ options }}</button>
+          <p style="display: inline-block; margin-left: 10px;" v-if="options !== '' && Array.isArray(poll.votes) && cr.includes(poll.id)">{{ (100*(poll.votes[index] / (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
         </div>
         
       </span>
@@ -282,14 +268,15 @@ function cn(val: any) {
         <div v-for="(poll, index) in publicPollData" :key="index">
             <span v-if="'pollQuestion' in poll && resp.includes(poll.id)">
             <h2 class="pollQuestion">
-                <span style="top: -5px" class="star" @click="toggleFavorite(poll.id, index)">★</span>
+                <span style="top: -5px" class="star" @click="toggleFavorite(poll.id, index)">{{ fav.includes(poll.id) ? '★' : '☆' }}</span>
                 <span style="top: -5px" class="delete" @click="deletePoll(poll.id, index)" v-if="cr.includes(poll.id)"> × </span>
                     {{ poll.pollQuestion }}
             </h2>
             </span>
-      <span v-if="'pollChoices' in poll && 'genre' in poll">
+      <span v-if="'pollChoices' in poll && 'genre' in poll && 'votes' in poll">
         <div v-for="(options, index) in poll.pollChoices">
           <button class="pollButtons" v-if="options !== ''  && resp.includes(poll.id)">{{ options }}</button>
+          <p style="display: inline-block; margin-left: 10px;" v-if="options !== '' && Array.isArray(poll.votes)  && resp.includes(poll.id)">{{ (100*(poll.votes[index] / (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
         </div>
         
       </span>
