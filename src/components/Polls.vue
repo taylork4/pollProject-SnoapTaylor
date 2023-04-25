@@ -65,6 +65,7 @@ let option4 = ref(1);
 let numPolls: number = 0;
 let pollCount: number = 1;
 let fav = ref<string[]>([]);
+let res = ref<string[]>([]);
 
 
 const isLoggedIn = ref(true)
@@ -81,7 +82,9 @@ auth.onAuthStateChanged(function (user: User | null) {
 })
 
 function dataAnalysis(data: any) {
-    fav.value = data.favorited;
+  fav.value = data.favorited;
+  res.value = data.responded;
+
 }
 
 async function fetchData(em: string) {
@@ -91,7 +94,7 @@ async function fetchData(em: string) {
   if (docSnap.exists()) {
     const data = docSnap.data();
     if (data) {
-        dataAnalysis(data);
+      dataAnalysis(data);
     } else {
       console.log("No data found in document!");
     }
@@ -333,7 +336,7 @@ async function optionsClick(pollID: string, index: number) {
       }
     }
   }
-//   window.location.reload();
+  //   window.location.reload();
 }
 
 async function toggleFavorite(pollID: string, index: number) {
@@ -393,7 +396,7 @@ async function toggleFavorite(pollID: string, index: number) {
           </div>
         </span>
         <span style="margin-top: 20px" v-if="option4 == 1 && option3 == 2">
-          <button style="margin-top: 20px" @click="op4"> + </button>          
+          <button style="margin-top: 20px" @click="op4"> + </button>
         </span>
         <span style="margin-top: 20px" v-if="option4 == 2">
           <div>
@@ -401,7 +404,7 @@ async function toggleFavorite(pollID: string, index: number) {
               class="answer" />
             <button style="margin-top: 20px;" @click="op4"> - </button>
           </div>
-        </span> 
+        </span>
         <div class="header"
           v-if="!(pollC[0] === '' || pollC[1] === '' || pollQ === '' || selectedGenre === 'Select a genre' || selectedGenre === '')">
           <button style="margin-top: 20px" @click="post"> Post </button>
@@ -415,16 +418,18 @@ async function toggleFavorite(pollID: string, index: number) {
   </span>
   <div v-if="createPoll == 1 && (filterGenre === 'Filter by Genre' || filterGenre === '')">
     <div v-for="(poll, index) in publicPollData" :key="index">
-      <span v-if="'pollQuestion' in poll">
+      <span v-if="'pollQuestion' in poll && !(res.includes(poll.id))">
         <h2 class="pollQuestion">
-          <span style="top: -5px; right: 5px;" class="star" @click="toggleFavorite(poll.id, index)" v-if="isLoggedIn">{{ fav.includes(poll.id) ? '★' : '☆' }}</span>
+          <span style="top: -5px; right: 5px;" class="star" @click="toggleFavorite(poll.id, index)" v-if="isLoggedIn">{{
+            fav.includes(poll.id) ? '★' : '☆' }}</span>
           {{ poll.pollQuestion }}
         </h2>
       </span>
-      <span v-if="'pollChoices' in poll && 'votes' in poll">
+      <span v-if="'pollChoices' in poll && 'votes' in poll && !(res.includes(poll.id))">
         <div v-for="(options, index) in poll.pollChoices">
           <button @click="optionsClick(poll.id, index)" class="pollButtons" v-if="options !== ''">{{ options }}</button>
-          <p style="display: inline-block; margin-left: 10px;" v-if="options !== '' && Array.isArray(poll.votes)">{{ (100*(poll.votes[index] / (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
+          <p style="display: inline-block; margin-left: 10px;" v-if="options !== '' && Array.isArray(poll.votes)">{{
+            (100 * (poll.votes[index] / (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
         </div>
       </span>
     </div>
@@ -433,14 +438,16 @@ async function toggleFavorite(pollID: string, index: number) {
     <div v-for="(poll, index) in publicPollData" :key="index">
       <span v-if="'pollQuestion' in poll && 'genre' in poll">
         <h2 class="pollQuestion" v-if="poll.genre === filterGenre">
-          <span style="top: -5px; right: 5px;" class="star" @click="toggleFavorite(poll.id, index)" v-if="isLoggedIn">{{ fav.includes(poll.id) ? '★' : '☆' }}</span>
+          <span style="top: -5px; right: 5px;" class="star" @click="toggleFavorite(poll.id, index)" v-if="isLoggedIn">{{
+            fav.includes(poll.id) ? '★' : '☆' }}</span>
           {{ poll.pollQuestion }}
         </h2>
       </span>
       <span v-if="'pollChoices' in poll && 'genre' in poll && 'votes' in poll">
         <div v-for="(options, index) in poll.pollChoices" v-if="poll.genre === filterGenre">
           <button @click="optionsClick(poll.id, index)" class="pollButtons" v-if="options !== ''">{{ options }}</button>
-          <p style="display: inline-block; margin-left: 10px;" v-if="options !== '' && Array.isArray(poll.votes)">{{ (100*(poll.votes[index] / (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
+          <p style="display: inline-block; margin-left: 10px;" v-if="options !== '' && Array.isArray(poll.votes)">{{
+            (100 * (poll.votes[index] / (poll.votes[0] + poll.votes[1] + poll.votes[2] + poll.votes[3]))).toFixed(2) }}%</p>
         </div>
       </span>
     </div>
@@ -579,10 +586,9 @@ select {
   color: rgb(0, 0, 0);
   position: relative;
 }
+
 .back-to-top {
   position: fixed;
   bottom: 20px;
   right: 20px;
-}
-
-</style>
+}</style>
